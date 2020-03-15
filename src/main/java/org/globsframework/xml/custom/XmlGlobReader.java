@@ -151,6 +151,19 @@ public class XmlGlobReader {
         }
     }
 
+    static class IntegerManageFieldAttr extends AbstractManageFieldAttr {
+        final IntegerField field;
+
+        IntegerManageFieldAttr(IntegerField field, String xmlName) {
+            super(xmlName);
+            this.field = field;
+        }
+
+        void update(MutableGlob mutableGlob, String value) {
+            mutableGlob.set(field, Integer.parseInt(value));
+        }
+    }
+
     static class GlobTypXmlNodeModel {
         private final GlobTypeXmlNodeModelService nodeModelService;
         GlobType globType;
@@ -165,7 +178,7 @@ public class XmlGlobReader {
                 if (field.hasAnnotation(_XmlAsNode.UNIQUE_KEY) || !field.getDataType().isPrimive()) {
                     fieldAsNode.put(xmlName, field.safeVisit(new FieldModelVisitor(this.nodeModelService)).manageFieldNode);
                 } else {
-                    fieldAsAttribute.add(field.safeVisit(new ManagedFialdAsAttrVisitor(xmlName)).manageFieldAttr);
+                    fieldAsAttribute.add(field.safeVisit(new ManagedFieldAsAttrVisitor(xmlName)).manageFieldAttr);
                 }
             }
         }
@@ -212,16 +225,20 @@ public class XmlGlobReader {
             }
         }
 
-        private static class ManagedFialdAsAttrVisitor extends FieldVisitor.AbstractWithErrorVisitor {
+        private static class ManagedFieldAsAttrVisitor extends FieldVisitor.AbstractWithErrorVisitor {
             ManageFieldAttr manageFieldAttr;
             private String xmlName;
 
-            public ManagedFialdAsAttrVisitor(String xmlName) {
+            public ManagedFieldAsAttrVisitor(String xmlName) {
                 this.xmlName = xmlName;
             }
 
             public void visitString(StringField field) throws Exception {
                 manageFieldAttr = new StringManageFieldAttr(field, xmlName);
+            }
+
+            public void visitInteger(IntegerField field) throws Exception {
+                manageFieldAttr = new IntegerManageFieldAttr(field, xmlName);
             }
         }
     }
