@@ -3,9 +3,9 @@ package org.globsframework.xml;
 import org.globsframework.metamodel.DummyModel;
 import org.globsframework.metamodel.DummyObject;
 import org.globsframework.model.*;
+import org.globsframework.utils.TestUtils;
 import org.globsframework.utils.exceptions.InvalidParameter;
 import org.globsframework.utils.exceptions.ItemNotFound;
-import org.globsframework.xml.XmlChangeSetParser;
 import org.junit.Test;
 
 import java.io.StringReader;
@@ -25,31 +25,31 @@ public class XmlChangeSetParserTest {
 
         assertEquals(3, changeSet.getChangeCount(DummyObject.TYPE));
         changeSet.visit(new ChangeSetVisitor() {
-            public void visitCreation(Key key, FieldValues values) throws Exception {
+            public void visitCreation(Key key, FieldsValueScanner values) throws Exception {
                 assertEquals(1, key.get(DummyObject.ID).intValue());
                 assertEquals(8, values.size());
-                assertEquals("name1", values.get(DummyObject.NAME));
-                assertEquals(2.0, values.get(DummyObject.VALUE), 0.01);
-                assertTrue(values.get(DummyObject.PRESENT));
-                assertNull(values.get(DummyObject.DATE));
+                assertEquals("name1", TestUtils.get(values, DummyObject.NAME));
+                assertEquals(2.0, (Double) TestUtils.get(values, DummyObject.VALUE), 0.01);
+                assertTrue((Boolean) TestUtils.get(values, DummyObject.PRESENT));
+                assertNull(TestUtils.get(values, DummyObject.DATE));
             }
 
-            public void visitUpdate(Key key, FieldValuesWithPrevious values) throws Exception {
+            public void visitUpdate(Key key, FieldsValueWithPreviousScanner values) throws Exception {
                 assertEquals(2, key.get(DummyObject.ID).intValue());
                 assertEquals(1, values.size());
-                assertEquals("newName", values.get(DummyObject.NAME));
-                assertEquals("previousName", values.getPrevious(DummyObject.NAME));
-                assertFalse(values.contains(DummyObject.DATE));
-                assertFalse(values.contains(DummyObject.VALUE));
+                assertEquals("newName", TestUtils.get(values, DummyObject.NAME));
+                assertEquals("previousName", TestUtils.getPrevious(values, DummyObject.NAME));
+                assertFalse(TestUtils.contains(values, DummyObject.DATE));
+                assertFalse(TestUtils.contains(values, DummyObject.VALUE));
             }
 
-            public void visitDeletion(Key key, FieldValues values) throws Exception {
+            public void visitDeletion(Key key, FieldsValueScanner values) throws Exception {
                 assertEquals(3, key.get(DummyObject.ID).intValue());
                 assertEquals(8, values.size());
-                assertEquals("name3", values.get(DummyObject.NAME));
-                assertNull(values.get(DummyObject.VALUE));
-                assertNull(values.get(DummyObject.PRESENT));
-                assertNull(values.get(DummyObject.DATE));
+                assertEquals("name3", TestUtils.get(values, DummyObject.NAME));
+                assertNull(TestUtils.get(values, DummyObject.VALUE));
+                assertNull(TestUtils.get(values, DummyObject.PRESENT));
+                assertNull(TestUtils.get(values, DummyObject.DATE));
             }
         });
     }
