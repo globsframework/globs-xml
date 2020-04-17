@@ -18,7 +18,7 @@ public class _XmlValueAsCData {
     public static Glob UNIQUE_GLOB;
 
     static {
-        GlobTypeLoaderFactory.create(_XmlValueAsCData.class, "_XmlAsNode")
+        GlobTypeLoaderFactory.create(_XmlValueAsCData.class, "_XmlAsCData")
         .register(GlobCreateFromAnnotation.class, annotation -> UNIQUE_GLOB)
         .load();
     }
