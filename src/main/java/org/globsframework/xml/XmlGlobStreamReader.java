@@ -129,6 +129,10 @@ public class XmlGlobStreamReader {
                 accessor = new XmlDateTimeAccessor(stream, field);
             }
 
+            public void visitStringArray(StringArrayField field) throws Exception {
+                accessor = new XmlStringArrayAccessor(stream, field);
+            }
+
             public Accessor getAccessor() {
                 return accessor;
             }
@@ -314,6 +318,24 @@ public class XmlGlobStreamReader {
 
                 public Object getObjectValue() {
                     return getDateTime();
+                }
+            }
+
+            private class XmlStringArrayAccessor implements StringArrayAccessor {
+                private final XmlDbStream xmlMoStream;
+                private final StringArrayField field;
+
+                public XmlStringArrayAccessor(XmlDbStream xmlMoStream, StringArrayField field) {
+                    this.xmlMoStream = xmlMoStream;
+                    this.field = field;
+                }
+
+                public String[] getString() {
+                    return xmlMoStream.current.get(field);
+                }
+
+                public Object getObjectValue() {
+                    return getString();
                 }
             }
 
