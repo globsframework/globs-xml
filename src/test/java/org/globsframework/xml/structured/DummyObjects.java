@@ -27,7 +27,7 @@ public class DummyObjects {
 //        public static GlobArrayUnionField SIMPLE_SUB_ARRAY;
 
         static {
-            GlobTypeLoaderFactory.create(DummyObject.class).load();
+            GlobTypeLoaderFactory.create(DummyObject.class, true).load();
         }
     }
 
@@ -42,7 +42,7 @@ public class DummyObjects {
         public static IntegerField COUNT;
 
         static {
-            GlobTypeLoaderFactory.createAndLoad(SubDummy.class);
+            GlobTypeLoaderFactory.createAndLoad(SubDummy.class, true);
         }
     }
 }
