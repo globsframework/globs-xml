@@ -76,7 +76,7 @@ public class XmlGlobReader {
         }
 
         public XmlNode fillFromSubNode(MutableGlob mutableGlob, String childName, Attributes xmlAttrs) {
-            GlobType type = field.getType();
+            GlobType type = field.getTargetType();
             MutableGlob instantiate = type.instantiate();
             mutableGlob.set(field, instantiate);
             return new GlobTypeXmlNode(nodeModelService, instantiate, xmlAttrs);
@@ -93,7 +93,7 @@ public class XmlGlobReader {
         }
 
         public XmlNode fillFromSubNode(MutableGlob mutableGlob, String childName, Attributes xmlAttrs) {
-            GlobType type = field.getType();
+            GlobType type = field.getTargetType();
             MutableGlob instantiate = type.instantiate();
             Glob[] globs = mutableGlob.get(field);
             Glob[] values = globs != null ? Arrays.copyOf(globs, globs.length + 1) : new Glob[1];
