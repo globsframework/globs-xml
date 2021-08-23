@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 import org.xml.sax.Attributes;
 
 import java.io.Reader;
+import java.time.ZonedDateTime;
 import java.util.*;
 
 public class XmlGlobReader {
@@ -61,6 +62,22 @@ public class XmlGlobReader {
             return new DefaultXmlNode(){
                 public void setValue(String value) {
                     mutableGlob.set(field, Integer.parseInt(value));
+                }
+            };
+        }
+    }
+
+    static class DateTimeManageFieldNode implements ManageFieldNode {
+        DateTimeField field;
+
+        public DateTimeManageFieldNode(DateTimeField field) {
+            this.field = field;
+        }
+
+        public XmlNode fillFromSubNode(MutableGlob mutableGlob, String childName, Attributes xmlAttrs) {
+            return new DefaultXmlNode(){
+                public void setValue(String value) {
+                    mutableGlob.set(field, ZonedDateTime.parse(value));
                 }
             };
         }
@@ -214,6 +231,10 @@ public class XmlGlobReader {
 
             public void visitInteger(IntegerField field) throws Exception {
                 manageFieldNode = new IntegerManageFieldNode(field);
+            }
+
+            public void visitDateTime(DateTimeField field) throws Exception {
+                manageFieldNode = new DateTimeManageFieldNode(field);
             }
 
             public void visitGlob(GlobField field) throws Exception {
