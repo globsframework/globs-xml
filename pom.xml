@@ -104,7 +104,7 @@
         <dependency>
             <groupId>org.globsframework</groupId>
             <artifactId>globs</artifactId>
-            <version>3.0</version>
+            <version>3.0-RELEASE</version>
         </dependency>
         <dependency>
             <groupId>org.globsframework</groupId>
