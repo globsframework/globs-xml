@@ -7,21 +7,20 @@ import org.globsframework.model.Glob;
 import org.globsframework.model.MutableGlob;
 import org.globsframework.saxstack.parser.*;
 import org.globsframework.saxstack.utils.XmlUtils;
+import org.globsframework.utils.Strings;
 import org.globsframework.xml.XmlGlobWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.Attributes;
 
 import java.io.Reader;
-import java.time.ZonedDateTime;
+import java.time.*;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.TemporalAccessor;
 import java.util.*;
 
 public class XmlGlobReader {
     private static final Logger LOGGER = LoggerFactory.getLogger(XmlGlobReader.class);
-
-    public interface GlobTypeAccessor {
-        GlobType get(String kind);
-    }
 
     public static Glob read(GlobTypeAccessor globTypeAccessor, Reader reader) {
         GlobTypeXmlNodeModelService globTypeXmlNodeModelService = new GlobTypeXmlNodeModelService();
@@ -30,9 +29,21 @@ public class XmlGlobReader {
         return rootNode.mutableGlob;
     }
 
+    public interface GlobTypeAccessor {
+        GlobType get(String kind);
+    }
+
 
     interface ManageFieldNode {
-         XmlNode fillFromSubNode(MutableGlob mutableGlob, String childName, Attributes xmlAttrs);
+        XmlNode fillFromSubNode(MutableGlob mutableGlob, String childName, Attributes xmlAttrs);
+    }
+
+    interface ManageFieldAttr {
+        void fill(MutableGlob mutableGlob, Attributes xmlAttrs);
+    }
+
+    interface UpdateFromStr {
+        void update(MutableGlob mutableGlob, String value);
     }
 
     static class StringManageFieldNode implements ManageFieldNode {
@@ -43,7 +54,7 @@ public class XmlGlobReader {
         }
 
         public XmlNode fillFromSubNode(MutableGlob mutableGlob, String childName, Attributes xmlAttrs) {
-            return new DefaultXmlNode(){
+            return new DefaultXmlNode() {
                 public void setValue(String value) {
                     mutableGlob.set(field, value);
                 }
@@ -59,7 +70,7 @@ public class XmlGlobReader {
         }
 
         public XmlNode fillFromSubNode(MutableGlob mutableGlob, String childName, Attributes xmlAttrs) {
-            return new DefaultXmlNode(){
+            return new DefaultXmlNode() {
                 public void setValue(String value) {
                     mutableGlob.set(field, Integer.parseInt(value));
                 }
@@ -68,16 +79,16 @@ public class XmlGlobReader {
     }
 
     static class DateTimeManageFieldNode implements ManageFieldNode {
-        DateTimeField field;
+        DateTimeConverter dateTimeConverter;
 
         public DateTimeManageFieldNode(DateTimeField field) {
-            this.field = field;
+            dateTimeConverter = new DateTimeConverter(field);
         }
 
         public XmlNode fillFromSubNode(MutableGlob mutableGlob, String childName, Attributes xmlAttrs) {
-            return new DefaultXmlNode(){
+            return new DefaultXmlNode() {
                 public void setValue(String value) {
-                    mutableGlob.set(field, ZonedDateTime.parse(value));
+                    dateTimeConverter.update(mutableGlob, value);
                 }
             };
         }
@@ -123,7 +134,7 @@ public class XmlGlobReader {
     static class GlobTypeXmlNodeModelService {
         Map<GlobType, GlobTypXmlNodeModel> xmlNodeModel = new HashMap<>();
 
-        public GlobTypXmlNodeModel get(GlobType globType){
+        public GlobTypXmlNodeModel get(GlobType globType) {
             GlobTypXmlNodeModel globTypXmlNodeModel = xmlNodeModel.get(globType);
             if (globTypXmlNodeModel == null) {
                 globTypXmlNodeModel = new GlobTypXmlNodeModel(globType, this);
@@ -131,10 +142,6 @@ public class XmlGlobReader {
             }
             return globTypXmlNodeModel;
         }
-    }
-
-    interface ManageFieldAttr {
-        void fill(MutableGlob mutableGlob, Attributes xmlAttrs);
     }
 
     static abstract class AbstractManageFieldAttr implements ManageFieldAttr {
@@ -153,7 +160,6 @@ public class XmlGlobReader {
 
         abstract void update(MutableGlob mutableGlob, String value);
     }
-
 
     static class StringManageFieldAttr extends AbstractManageFieldAttr {
         final StringField field;
@@ -181,8 +187,145 @@ public class XmlGlobReader {
         }
     }
 
+    static class DoubleManageFieldAttr extends AbstractManageFieldAttr {
+        final DoubleField field;
+
+        DoubleManageFieldAttr(DoubleField field, String xmlName) {
+            super(xmlName);
+            this.field = field;
+        }
+
+        void update(MutableGlob mutableGlob, String value) {
+            mutableGlob.set(field, Double.parseDouble(value));
+        }
+    }
+
+    static class IntegerConverter implements UpdateFromStr {
+        private final IntegerField field;
+
+        IntegerConverter(IntegerField field) {
+            this.field = field;
+        }
+
+        public void update(MutableGlob mutableGlob, String value) {
+            if (Strings.isNotEmpty(value)) {
+                mutableGlob.set(field, Integer.parseInt(value));
+            }
+        }
+    }
+
+    static class DoubleConverter implements UpdateFromStr {
+        private final DoubleField field;
+
+        DoubleConverter(DoubleField field) {
+            this.field = field;
+        }
+
+        public void update(MutableGlob mutableGlob, String value) {
+            if (Strings.isNotEmpty(value)) {
+                mutableGlob.set(field, Double.parseDouble(value));
+            }
+        }
+    }
+
+    static class BooleanConverter implements UpdateFromStr {
+        private final BooleanField field;
+
+        BooleanConverter(BooleanField field) {
+            this.field = field;
+        }
+
+        public void update(MutableGlob mutableGlob, String value) {
+            if (Strings.isNotEmpty(value)) {
+                mutableGlob.set(field, Boolean.parseBoolean(value));
+            }
+        }
+    }
+
+    static class DateConverter implements UpdateFromStr {
+        private final DateField field;
+        private final DateTimeFormatter dateTimeFormatter;
+
+        DateConverter(DateField field) {
+            this.field = field;
+            Glob dataFormat = field.findAnnotation(_XmlExportDateFormat.UNIQUE_KEY);
+            if (dataFormat != null) {
+                String s = dataFormat.get(_XmlExportDateFormat.FORMAT);
+                dateTimeFormatter = DateTimeFormatter.ofPattern(s);
+            } else {
+                dateTimeFormatter = DateTimeFormatter.ISO_DATE;
+            }
+        }
+
+        public void update(MutableGlob mutableGlob, String value) {
+            if (Strings.isNotEmpty(value)) {
+                mutableGlob.set(field, LocalDate.from(dateTimeFormatter.parse(value.trim())));
+            }
+        }
+    }
+
+    static class DateManageFieldAttr extends AbstractManageFieldAttr {
+        DateConverter dateConverter;
+
+        protected DateManageFieldAttr(DateField date, String xmlName) {
+            super(xmlName);
+            dateConverter = new DateConverter(date);
+        }
+
+        void update(MutableGlob mutableGlob, String value) {
+            dateConverter.update(mutableGlob, value);
+        }
+    }
+
+    static class DateTimeConverter implements UpdateFromStr {
+        final DateTimeField field;
+        private final ZoneId zoneId;
+        private DateTimeFormatter dateTimeFormatter;
+
+        DateTimeConverter(DateTimeField field) {
+            this.field = field;
+            Glob dataFormat = field.findAnnotation(_XmlExportDateFormat.UNIQUE_KEY);
+            if (dataFormat != null) {
+                String s = dataFormat.get(_XmlExportDateFormat.FORMAT);
+                zoneId = ZoneId.of(dataFormat.get(_XmlExportDateFormat.ZONE_ID, ZoneId.systemDefault().getId()));
+                dateTimeFormatter = DateTimeFormatter.ofPattern(s).withZone(zoneId);
+            } else {
+                zoneId = ZoneId.systemDefault();
+                dateTimeFormatter = DateTimeFormatter.ISO_DATE_TIME.withZone(zoneId);
+            }
+        }
+
+        public void update(MutableGlob mutableGlob, String value) {
+            if (Strings.isNotEmpty(value)) {
+                TemporalAccessor temporalAccessor = dateTimeFormatter.parseBest(value.trim(), ZonedDateTime::from, LocalDateTime::from, LocalDate::from);
+                if (temporalAccessor instanceof ZonedDateTime) {
+                    mutableGlob.set(field, (ZonedDateTime) temporalAccessor);
+                } else if (temporalAccessor instanceof LocalDateTime) {
+                    mutableGlob.set(field, ((LocalDateTime) temporalAccessor).atZone(zoneId));
+                } else if (temporalAccessor instanceof LocalDate) {
+                    mutableGlob.set(field, ZonedDateTime.of((LocalDate) temporalAccessor, LocalTime.MIDNIGHT, zoneId));
+                }
+            }
+        }
+    }
+
+    static class DateTimeFieldReader extends AbstractManageFieldAttr {
+        DateTimeConverter dateTimeConverter;
+
+        DateTimeFieldReader(DateTimeField field, String xmlName) {
+            super(xmlName);
+            dateTimeConverter = new DateTimeConverter(field);
+        }
+
+        void update(MutableGlob mutableGlob, String value) {
+            dateTimeConverter.update(mutableGlob, value);
+        }
+    }
+
+
     static class GlobTypXmlNodeModel {
         private final GlobTypeXmlNodeModelService nodeModelService;
+        private UpdateFromStr valueUpdated = null;
         private GlobType globType;
         private Map<String, ManageFieldNode> fieldAsNode = new HashMap<>();
         private Collection<ManageFieldAttr> fieldAsAttribute = new ArrayList<>();
@@ -195,8 +338,8 @@ public class XmlGlobReader {
                 String xmlName = XmlGlobWriter.getXmlName(field);
                 if (field.hasAnnotation(_XmlAsNode.UNIQUE_KEY) || !field.getDataType().isPrimive()) {
                     fieldAsNode.put(xmlName, field.safeVisit(new FieldModelVisitor(this.nodeModelService)).manageFieldNode);
-                } else if (field.hasAnnotation(_XmlValue.UNIQUE_KEY)){
-                    valueField = field;
+                } else if (field.hasAnnotation(_XmlValue.UNIQUE_KEY)) {
+                    valueUpdated = field.safeVisit(new ConvertFieldAsAttrVisitor()).updateFromStr;
                 } else {
                     fieldAsAttribute.add(field.safeVisit(new ManagedFieldAsAttrVisitor(xmlName)).manageFieldAttr);
                 }
@@ -213,22 +356,21 @@ public class XmlGlobReader {
             ManageFieldNode field = fieldAsNode.get(childName);
             if (field != null) {
                 return field.fillFromSubNode(mutableGlob, childName, xmlAttrs);
-            }
-            else {
+            } else {
                 LOGGER.warn(childName + " ignored.");
                 return SilentXmlNode.INSTANCE;
             }
         }
 
         public void setValue(MutableGlob mutableGlob, String value) {
-            if (valueField != null) {
-                mutableGlob.set(valueField.asStringField(), value);
+            if (valueUpdated != null) {
+                valueUpdated.update(mutableGlob, value);
             }
         }
 
         private static class FieldModelVisitor extends FieldVisitor.AbstractWithErrorVisitor {
-            private ManageFieldNode manageFieldNode;
             private final GlobTypeXmlNodeModelService nodeModelService;
+            private ManageFieldNode manageFieldNode;
 
             private FieldModelVisitor(GlobTypeXmlNodeModelService nodeModelService) {
                 this.nodeModelService = nodeModelService;
@@ -242,6 +384,10 @@ public class XmlGlobReader {
                 manageFieldNode = new IntegerManageFieldNode(field);
             }
 
+            public void visitDate(DateField field) throws Exception {
+                manageFieldNode = new DateManageFieldNode(field);
+            }
+
             public void visitDateTime(DateTimeField field) throws Exception {
                 manageFieldNode = new DateTimeManageFieldNode(field);
             }
@@ -252,6 +398,25 @@ public class XmlGlobReader {
 
             public void visitGlobArray(GlobArrayField field) throws Exception {
                 manageFieldNode = new GlobArrayManageFieldNode(nodeModelService, field);
+            }
+
+            private static class DateManageFieldNode implements ManageFieldNode {
+                final DateConverter dateConverter;
+                private final DateField field;
+
+                public DateManageFieldNode(DateField field) {
+                    this.field = field;
+                    dateConverter = new DateConverter(field);
+                }
+
+                public XmlNode fillFromSubNode(MutableGlob mutableGlob, String childName, Attributes xmlAttrs) {
+                    return new DefaultXmlNode() {
+                        @Override
+                        public void setValue(String value) {
+                            dateConverter.update(mutableGlob, value);
+                        }
+                    };
+                }
             }
         }
 
@@ -269,6 +434,58 @@ public class XmlGlobReader {
 
             public void visitInteger(IntegerField field) throws Exception {
                 manageFieldAttr = new IntegerManageFieldAttr(field, xmlName);
+            }
+
+            public void visitDouble(DoubleField field) throws Exception {
+                manageFieldAttr = new DoubleManageFieldAttr(field, xmlName);
+            }
+
+            public void visitDate(DateField field) throws Exception {
+                manageFieldAttr = new DateManageFieldAttr(field, xmlName);
+            }
+
+            public void visitDateTime(DateTimeField field) throws Exception {
+                manageFieldAttr = new DateTimeFieldReader(field, xmlName);
+            }
+        }
+
+        private static class ConvertFieldAsAttrVisitor extends FieldVisitor.AbstractWithErrorVisitor {
+            UpdateFromStr updateFromStr;
+
+            public void visitString(StringField field) throws Exception {
+                updateFromStr = new StringUpdateFromStr(field);
+            }
+
+            public void visitInteger(IntegerField field) throws Exception {
+                updateFromStr = new IntegerConverter(field);
+            }
+
+            public void visitDouble(DoubleField field) throws Exception {
+                updateFromStr = new DoubleConverter(field);
+            }
+
+            public void visitDate(DateField field) throws Exception {
+                updateFromStr = new DateConverter(field);
+            }
+
+            public void visitDateTime(DateTimeField field) throws Exception {
+                updateFromStr = new DateTimeConverter(field);
+            }
+
+            public void visitBoolean(BooleanField field) throws Exception {
+                updateFromStr = new BooleanConverter(field);
+            }
+
+            private class StringUpdateFromStr implements UpdateFromStr {
+                private StringField field;
+
+                public StringUpdateFromStr(StringField field) {
+                    this.field = field;
+                }
+
+                public void update(MutableGlob mutableGlob, String value) {
+                    mutableGlob.set(field, value);
+                }
             }
         }
     }

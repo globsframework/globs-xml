@@ -9,6 +9,9 @@ import org.globsframework.xml.XmlGlobWriter;
 
 import java.io.IOException;
 import java.io.Writer;
+import java.time.LocalDate;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 
 public class XmlGlobBuilder {
 
@@ -63,6 +66,30 @@ public class XmlGlobBuilder {
 
         public void visitBoolean(BooleanField field, Boolean value) throws Exception {
             dumpSimpleValue(field, value != null ? Boolean.toString(value) : null);
+        }
+
+        public void visitDate(DateField field, LocalDate value) throws Exception {
+            DateTimeFormatter dateTimeFormatter;
+            if (field.hasAnnotation(_XmlExportDateFormat.UNIQUE_KEY)) {
+                Glob annotation = field.getAnnotation(_XmlExportDateFormat.UNIQUE_KEY);
+                dateTimeFormatter = DateTimeFormatter.ofPattern(annotation.get(_XmlExportDateFormat.FORMAT));
+            }
+            else {
+                dateTimeFormatter = DateTimeFormatter.ISO_DATE;
+            }
+            dumpSimpleValue(field, value != null ? dateTimeFormatter.format(value) : null);
+        }
+
+        public void visitDateTime(DateTimeField field, ZonedDateTime value) throws Exception {
+            DateTimeFormatter dateTimeFormatter;
+            if (field.hasAnnotation(_XmlExportDateFormat.UNIQUE_KEY)) {
+                Glob annotation = field.getAnnotation(_XmlExportDateFormat.UNIQUE_KEY);
+                dateTimeFormatter = DateTimeFormatter.ofPattern(annotation.get(_XmlExportDateFormat.FORMAT));
+            }
+            else {
+                dateTimeFormatter = DateTimeFormatter.ISO_DATE_TIME;
+            }
+            dumpSimpleValue(field, value != null ? dateTimeFormatter.format(value) : null);
         }
 
         public void visitGlob(GlobField field, Glob value) throws Exception {
