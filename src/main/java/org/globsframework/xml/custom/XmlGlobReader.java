@@ -183,9 +183,10 @@ public class XmlGlobReader {
 
     static class GlobTypXmlNodeModel {
         private final GlobTypeXmlNodeModelService nodeModelService;
-        GlobType globType;
-        Map<String, ManageFieldNode> fieldAsNode = new HashMap<>();
-        Collection<ManageFieldAttr> fieldAsAttribute = new ArrayList<>();
+        private GlobType globType;
+        private Map<String, ManageFieldNode> fieldAsNode = new HashMap<>();
+        private Collection<ManageFieldAttr> fieldAsAttribute = new ArrayList<>();
+        private Field valueField;
 
         public GlobTypXmlNodeModel(GlobType globType, GlobTypeXmlNodeModelService nodeModelService) {
             this.nodeModelService = nodeModelService;
@@ -194,6 +195,8 @@ public class XmlGlobReader {
                 String xmlName = XmlGlobWriter.getXmlName(field);
                 if (field.hasAnnotation(_XmlAsNode.UNIQUE_KEY) || !field.getDataType().isPrimive()) {
                     fieldAsNode.put(xmlName, field.safeVisit(new FieldModelVisitor(this.nodeModelService)).manageFieldNode);
+                } else if (field.hasAnnotation(_XmlValue.UNIQUE_KEY)){
+                    valueField = field;
                 } else {
                     fieldAsAttribute.add(field.safeVisit(new ManagedFieldAsAttrVisitor(xmlName)).manageFieldAttr);
                 }
@@ -214,6 +217,12 @@ public class XmlGlobReader {
             else {
                 LOGGER.warn(childName + " ignored.");
                 return SilentXmlNode.INSTANCE;
+            }
+        }
+
+        public void setValue(MutableGlob mutableGlob, String value) {
+            if (valueField != null) {
+                mutableGlob.set(valueField.asStringField(), value);
             }
         }
 
@@ -281,7 +290,7 @@ public class XmlGlobReader {
         }
 
         public void setValue(String value) throws ExceptionHolder {
-
+            globTypXmlNodeModel.setValue(mutableGlob, value);
         }
 
         public void complete() throws ExceptionHolder {

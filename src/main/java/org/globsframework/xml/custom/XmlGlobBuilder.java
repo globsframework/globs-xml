@@ -43,7 +43,10 @@ public class XmlGlobBuilder {
                     }
                     xmlTag = xmlTag.end();
                 }
-            } else {
+            } else if (field.hasAnnotation(_XmlValue.UNIQUE_KEY)) {
+                xmlTag.addValue(strValue);
+            }
+            else {
                 if (strValue != null) {
                     xmlTag.addAttribute(XmlGlobWriter.getXmlName(field), strValue);
                 }
