@@ -19,7 +19,7 @@ public class XmlWithValueTest {
     public void withValue() throws IOException {
         Glob actual = XmlGlobReader.read(kind -> RootWithValue.TYPE, new StringReader(
                 "<root>" +
-                        "  <dataWithValue valueAsAttr=\"attrValue\" valueAsAttrDouble=\"3.14\" valueAsAttrDateTime=\"2011-12-03T10:15:30+01:00\">value</dataWithValue> " +
+                        "  <dataWithValue valueAsAttr=\"attrValue\" valueAsAttrDouble=\"3.14\" valueAsAttrDateTime=\"2011-12-03T10:15:30\">value</dataWithValue> " +
                         "</root>"
         ));
 
@@ -29,7 +29,7 @@ public class XmlWithValueTest {
         Assert.assertEquals("value", actual.get(RootWithValue.dataWithValue).get(DataWithMixValue.valueAsValue));
         StringWriter writer = new StringWriter();
         XmlGlobBuilder.write(actual, writer);
-        Assert.assertEquals("<rootWithValue><dataWithValue valueAsAttr=\"attrValue\" valueAsAttrDouble=\"3.14\" valueAsAttrDateTime=\"2011-12-03T10:15:30+01:00[Europe/Paris]\">value</dataWithValue></rootWithValue>", writer.toString());
+        Assert.assertEquals("<rootWithValue><dataWithValue valueAsAttr=\"attrValue\" valueAsAttrDouble=\"3.14\" valueAsAttrDateTime=\"2011-12-03T10:15:30\">value</dataWithValue></rootWithValue>", writer.toString());
     }
 
 

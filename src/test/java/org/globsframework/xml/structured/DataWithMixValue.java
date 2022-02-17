@@ -5,6 +5,7 @@ import org.globsframework.metamodel.GlobTypeLoaderFactory;
 import org.globsframework.metamodel.fields.DateTimeField;
 import org.globsframework.metamodel.fields.DoubleField;
 import org.globsframework.metamodel.fields.StringField;
+import org.globsframework.xml.custom.XmlExportDateFormat_;
 import org.globsframework.xml.custom.XmlValue_;
 
 import java.time.format.DateTimeFormatter;
@@ -16,6 +17,7 @@ public class DataWithMixValue {
 
     public static DoubleField valueAsAttrDouble;
 
+    @XmlExportDateFormat_(value = "yyyy-MM-dd'T'HH:mm:ss", zoneId = "Europe/Paris")
     public static DateTimeField valueAsAttrDateTime;
 
     @XmlValue_

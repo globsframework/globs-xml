@@ -13,6 +13,10 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 public @interface XmlExportDateFormat_ {
 
+    String value();
+
+    String zoneId() default "";
+
     GlobType TYPE = _XmlExportDateFormat.TYPE;
 
 }

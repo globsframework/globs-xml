@@ -19,12 +19,12 @@ public class _XmlExportDateFormat {
     @InitUniqueKey
     public static Key UNIQUE_KEY;
 
-    @InitUniqueGlob
-    public static Glob UNIQUE_GLOB;
-
     static {
         GlobTypeLoaderFactory.create(_XmlExportDateFormat.class, "XmlExportDateFormat")
-                .register(GlobCreateFromAnnotation.class, annotation -> UNIQUE_GLOB)
+                .register(GlobCreateFromAnnotation.class, annotation -> TYPE.instantiate()
+                        .set(FORMAT, ((XmlExportDateFormat_) annotation).value())
+                        .set(ZONE_ID, ((XmlExportDateFormat_) annotation).zoneId())
+                )
                 .load();
     }
 
