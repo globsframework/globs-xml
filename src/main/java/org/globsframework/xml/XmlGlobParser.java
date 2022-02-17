@@ -3,7 +3,6 @@ package org.globsframework.xml;
 import org.globsframework.metamodel.Field;
 import org.globsframework.metamodel.GlobModel;
 import org.globsframework.metamodel.GlobType;
-import org.globsframework.metamodel.annotations.FieldNameAnnotation;
 import org.globsframework.metamodel.annotations.FieldNameAnnotationType;
 import org.globsframework.metamodel.fields.IntegerField;
 import org.globsframework.metamodel.links.FieldMappingFunction;
@@ -86,28 +85,12 @@ public class XmlGlobParser {
                 }
                 return repository.findOrCreate(KeyBuilder.createFromValues(globType, builder.get()), builder.toArray());
             }
-            catch (ItemNotFound found) {
+            catch (TypeNotFound | ItemNotFound | MissingInfo | ItemAlreadyExists found) {
                 if (ignoreError) {
                     return null;
                 }
                 else {
                     throw found;
-                }
-            }
-            catch (MissingInfo info) {
-                if (ignoreError) {
-                    return null;
-                }
-                else {
-                    throw info;
-                }
-            }
-            catch (ItemAlreadyExists exists) {
-                if (ignoreError) {
-                    return null;
-                }
-                else {
-                    throw exists;
                 }
             }
         }
