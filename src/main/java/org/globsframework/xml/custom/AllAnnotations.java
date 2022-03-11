@@ -4,5 +4,5 @@ import org.globsframework.metamodel.GlobModel;
 import org.globsframework.metamodel.impl.DefaultGlobModel;
 
 public class AllAnnotations {
-    public static GlobModel MODEL = new DefaultGlobModel(_XmlAsNode.TYPE, _XmlValueAsCData.TYPE);
+    public static GlobModel MODEL = new DefaultGlobModel(_XmlAsNode.TYPE, _XmlValueAsCData.TYPE, XmlNS.TYPE, _XmlValue.TYPE, _XmlExportDateFormat.TYPE);
 }
