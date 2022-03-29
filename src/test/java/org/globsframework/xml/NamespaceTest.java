@@ -2,7 +2,6 @@ package org.globsframework.xml;
 
 import org.globsframework.metamodel.GlobType;
 import org.globsframework.metamodel.GlobTypeLoaderFactory;
-import org.globsframework.metamodel.annotations.Comment_;
 import org.globsframework.metamodel.annotations.FieldNameAnnotation;
 import org.globsframework.metamodel.annotations.Target;
 import org.globsframework.metamodel.fields.GlobField;
@@ -56,7 +55,7 @@ public class NamespaceTest {
         XmlTestUtils.assertEquivalent(text2, writer.toString());
     }
 
-    public  static class Y2EnvelopeType {
+    public static class Y2EnvelopeType {
         @XmlNS_(url = "http://schemas.xmlsoap.org/soap/envelope/", name = "soapenv")
         public static GlobType TYPE;
 
@@ -84,6 +83,7 @@ public class NamespaceTest {
             GlobTypeLoaderFactory.create(Y2SoapBodyType.class).load();
         }
     }
+
     public static class Y2GetCustomerDetailRequest {
         @XmlNS_(url = "http://www.cegid.fr/Retail/1.0")
         public static GlobType TYPE;

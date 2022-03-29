@@ -78,6 +78,22 @@ public class XmlGlobReader {
         }
     }
 
+    static class BooleanManageFieldNode implements ManageFieldNode {
+        BooleanField field;
+
+        public BooleanManageFieldNode(BooleanField field) {
+            this.field = field;
+        }
+
+        public XmlNode fillFromSubNode(MutableGlob mutableGlob, String childName, Attributes xmlAttrs) {
+            return new DefaultXmlNode() {
+                public void setValue(String value) {
+                    mutableGlob.set(field, Boolean.parseBoolean(value));
+                }
+            };
+        }
+    }
+
     static class DateTimeManageFieldNode implements ManageFieldNode {
         DateTimeConverter dateTimeConverter;
 
@@ -374,6 +390,10 @@ public class XmlGlobReader {
 
             private FieldModelVisitor(GlobTypeXmlNodeModelService nodeModelService) {
                 this.nodeModelService = nodeModelService;
+            }
+
+            public void visitBoolean(BooleanField field) throws Exception {
+                manageFieldNode = new BooleanManageFieldNode(field);
             }
 
             public void visitString(StringField field) throws Exception {
