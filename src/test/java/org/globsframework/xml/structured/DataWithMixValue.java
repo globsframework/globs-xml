@@ -20,6 +20,8 @@ public class DataWithMixValue {
     @XmlExportDateFormat_(value = "yyyy-MM-dd'T'HH:mm:ss", zoneId = "Europe/Paris")
     public static DateTimeField valueAsAttrDateTime;
 
+    public static DateTimeField correctDate;
+
     @XmlValue_
     public static StringField valueAsValue;
 
