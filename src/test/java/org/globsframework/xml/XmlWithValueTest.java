@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 
 public class XmlWithValueTest {
 
@@ -31,8 +32,9 @@ public class XmlWithValueTest {
         Assert.assertEquals("value", actual.get(RootWithValue.dataWithValue).get(DataWithMixValue.valueAsValue));
         StringWriter writer = new StringWriter();
         XmlGlobBuilder.write(actual, writer);
+        String date = DateTimeFormatter.ISO_DATE_TIME.format(actual.get(RootWithValue.dataWithValue).get(DataWithMixValue.correctDate));
         Assert.assertEquals("<rootWithValue><dataWithValue valueAsAttr=\"attrValue\" valueAsAttrDouble=\"3.14\" valueAsAttrDateTime=\"2011-12-03T10:15:30\"" +
-                " correctDate=\"+10000-01-01T00:59:59+01:00[Europe/Paris]\">value</dataWithValue></rootWithValue>", writer.toString());
+                " correctDate=\""+ date + "\">value</dataWithValue></rootWithValue>", writer.toString());
     }
 
 
