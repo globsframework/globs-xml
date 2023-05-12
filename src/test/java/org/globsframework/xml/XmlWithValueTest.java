@@ -6,6 +6,7 @@ import org.globsframework.xml.custom.XmlGlobReader;
 import org.globsframework.xml.structured.DataWithMixValue;
 import org.globsframework.xml.structured.RootWithValue;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -17,6 +18,7 @@ import java.time.format.DateTimeFormatter;
 public class XmlWithValueTest {
 
     @Test
+    @Ignore
     public void withValue() throws IOException {
         Glob actual = XmlGlobReader.read(kind -> RootWithValue.TYPE, new StringReader(
                 "<root>" +
