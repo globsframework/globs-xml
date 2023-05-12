@@ -161,8 +161,15 @@ public class XmlGlobBuilder {
         public void visitGlob(GlobField field, Glob value) throws Exception {
             if (value != null) {
                 GlobType targetType = field.getTargetType();
-                ns.push(ns.element().sub(targetType));
+                final boolean useParent = field.findOptAnnotation(XmlUseParentNS.UNIQUE_KEY)
+                        .map(XmlUseParentNS.useParent).orElse(false);
+                if (!useParent) {
+                    ns.push(ns.element().sub(targetType));
+                }
                 xmlTag = xmlTag.createChildTag(ns.element().addToTag(XmlGlobWriter.getXmlName(field)));
+                if (useParent) {
+                    ns.push(ns.element().sub(targetType));
+                }
                 ns.element().addAttr(xmlTag);
                 value.safeAccept(this);
                 xmlTag = xmlTag.end();
@@ -174,8 +181,15 @@ public class XmlGlobBuilder {
             if (value != null && value.length != 0) {
                 GlobType targetType = field.getTargetType();
                 for (Glob glob : value) {
-                    ns.push(ns.element().sub(targetType));
+                    final boolean useParent = field.findOptAnnotation(XmlUseParentNS.UNIQUE_KEY)
+                            .map(XmlUseParentNS.useParent).orElse(false);
+                    if (!useParent) {
+                        ns.push(ns.element().sub(targetType));
+                    }
                     xmlTag = xmlTag.createChildTag(ns.element().addToTag(XmlGlobWriter.getXmlName(field)));
+                    if (useParent) {
+                        ns.push(ns.element().sub(targetType));
+                    }
                     ns.element().addAttr(xmlTag);
                     glob.safeAccept(this);
                     xmlTag = xmlTag.end();

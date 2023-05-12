@@ -7,10 +7,7 @@ import org.globsframework.metamodel.annotations.Target;
 import org.globsframework.metamodel.fields.GlobField;
 import org.globsframework.metamodel.fields.StringField;
 import org.globsframework.model.Glob;
-import org.globsframework.xml.custom.XmlGlobBuilder;
-import org.globsframework.xml.custom.XmlGlobReader;
-import org.globsframework.xml.custom.XmlNS_;
-import org.globsframework.xml.custom.XmlNode_;
+import org.globsframework.xml.custom.*;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -25,7 +22,10 @@ public class NamespaceTest {
         String text2 = "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:ns=\"http://www.cegid.fr/Retail/1.0\">\n" +
                 "   <soapenv:Body>\n" +
                 "      <ns:GetCustomerDetail>\n" +
-                "         <ns:customerId>001000000018</ns:customerId>\n" +
+                       "         <ns:customerId>001000000018</ns:customerId>\n" +
+                       "  <ns:priosWithParentNS xmlns:prios=\"http://www.cegid.fr/Retail/1.0\">" +
+                       "         <prios:customerId>001000000018</prios:customerId>\n" +
+                       "    </ns:priosWithParentNS>" +
                 "      </ns:GetCustomerDetail>\n" +
                 "   </soapenv:Body>\n" +
                 "</soapenv:Envelope>";
@@ -34,7 +34,10 @@ public class NamespaceTest {
                 "   <soapenv:Body>\n" +
                 "      <GetCustomerDetail xmlns=\"http://www.cegid.fr/Retail/1.0\">\n" +
                 "         <customerId>001000000018</customerId>\n" +
-                "      </GetCustomerDetail>\n" +
+                       "     <priosWithParentNS xmlns:prios=\"http://www.cegid.fr/Retail/1.0\">" +
+                       "         <prios:customerId>001000000018</prios:customerId>\n" +
+                       "    </priosWithParentNS>" +
+                       "      </GetCustomerDetail>\n" +
                 "   </soapenv:Body>\n" +
                 "</soapenv:Envelope>";
 
@@ -53,6 +56,7 @@ public class NamespaceTest {
         writer = new StringWriter();
         XmlGlobBuilder.write(glob1, writer);
         XmlTestUtils.assertEquivalent(text2, writer.toString());
+        System.out.println("NamespaceTest.name " + writer.toString());
     }
 
     public static class Y2EnvelopeType {
@@ -92,8 +96,27 @@ public class NamespaceTest {
         @FieldNameAnnotation("customerId")
         public static StringField customerId;
 
+        @Target(PriosOtherDetailRequest.class)
+        @XmlNode_
+        @XmlUseParentNS_
+        public static GlobField priosWithParentNS;
+
         static {
             GlobTypeLoaderFactory.create(Y2GetCustomerDetailRequest.class).load();
+        }
+
+    }
+
+    public static class PriosOtherDetailRequest {
+        @XmlNS_(url = "http://www.prios.fr", name = "prios")
+        public static GlobType TYPE;
+
+        @XmlNode_
+        @FieldNameAnnotation("customerId")
+        public static StringField customerId;
+
+        static {
+            GlobTypeLoaderFactory.create(PriosOtherDetailRequest.class).load();
         }
 
     }
