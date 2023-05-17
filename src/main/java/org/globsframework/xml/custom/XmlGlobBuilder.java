@@ -158,6 +158,12 @@ public class XmlGlobBuilder {
             dumpSimpleValue(field, value != null ? dateTimeFormatter.format(value) : null);
         }
 
+        public void visitStringArray(StringArrayField field, String[] value) throws Exception {
+            for (String s : value) {
+                dumpSimpleValue(field, s);
+            }
+        }
+
         public void visitGlob(GlobField field, Glob value) throws Exception {
             if (value != null) {
                 GlobType targetType = field.getTargetType();

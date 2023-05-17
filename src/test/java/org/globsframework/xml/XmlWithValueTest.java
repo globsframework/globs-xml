@@ -40,4 +40,23 @@ public class XmlWithValueTest {
     }
 
 
+    @Test
+    public void withArrayValue() throws IOException {
+        Glob actual = XmlGlobReader.read(kind -> RootWithValue.TYPE, new StringReader(
+                "<root>" +
+                "  <dataWithValue>" +
+                "    <array>AAA</array>" +
+                "    <array>BBB</array>" +
+                "   </dataWithValue> " +
+                "</root>"
+        ));
+
+        Assert.assertEquals(2, actual.get(RootWithValue.dataWithValue).get(DataWithMixValue.array).length);
+        Assert.assertEquals("AAA", actual.get(RootWithValue.dataWithValue).get(DataWithMixValue.array)[0]);
+        Assert.assertEquals("BBB", actual.get(RootWithValue.dataWithValue).get(DataWithMixValue.array)[1]);
+        StringWriter writer = new StringWriter();
+        XmlGlobBuilder.write(actual, writer);
+        Assert.assertEquals("<rootWithValue><dataWithValue><array>AAA</array><array>BBB</array></dataWithValue></rootWithValue>", writer.toString());
+    }
+
 }

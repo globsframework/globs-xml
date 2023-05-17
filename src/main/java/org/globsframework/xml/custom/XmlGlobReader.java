@@ -62,6 +62,30 @@ public class XmlGlobReader {
         }
     }
 
+    static class StringArrayManageFieldNode implements ManageFieldNode {
+        StringArrayField field;
+
+        public StringArrayManageFieldNode(StringArrayField field) {
+            this.field = field;
+        }
+
+        public XmlNode fillFromSubNode(MutableGlob mutableGlob, String childName, Attributes xmlAttrs) {
+            return new DefaultXmlNode() {
+                public void setValue(String value) {
+                    String[] strings = mutableGlob.get(field);
+                    if (strings == null) {
+                        mutableGlob.set(field, new String[]{value});
+                    }
+                    else {
+                        strings = Arrays.copyOf(strings, strings.length + 1);
+                        strings[strings.length - 1] = value;
+                        mutableGlob.set(field, strings);
+                    }
+                }
+            };
+        }
+    }
+
     static class IntegerManageFieldNode implements ManageFieldNode {
         IntegerField field;
 
@@ -398,6 +422,10 @@ public class XmlGlobReader {
 
             public void visitString(StringField field) throws Exception {
                 manageFieldNode = new StringManageFieldNode(field);
+            }
+
+            public void visitStringArray(StringArrayField field) throws Exception {
+                manageFieldNode = new StringArrayManageFieldNode(field);
             }
 
             public void visitInteger(IntegerField field) throws Exception {
