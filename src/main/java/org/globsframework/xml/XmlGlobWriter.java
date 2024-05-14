@@ -1,11 +1,9 @@
 package org.globsframework.xml;
 
-import org.globsframework.metamodel.Field;
+import org.globsframework.metamodel.fields.Field;
 import org.globsframework.metamodel.GlobLinkModel;
 import org.globsframework.metamodel.GlobType;
-import org.globsframework.metamodel.annotations.FieldNameAnnotation;
 import org.globsframework.metamodel.annotations.FieldNameAnnotationType;
-import org.globsframework.metamodel.fields.*;
 import org.globsframework.metamodel.links.Link;
 import org.globsframework.metamodel.links.impl.DefaultDirectSingleLink;
 import org.globsframework.metamodel.utils.EmptyGlobLinkModel;
@@ -14,19 +12,13 @@ import org.globsframework.model.Glob;
 import org.globsframework.model.GlobList;
 import org.globsframework.model.GlobRepository;
 import org.globsframework.saxstack.utils.XmlUtils;
-import org.globsframework.saxstack.writer.XmlTag;
-import org.globsframework.saxstack.writer.XmlWriter;
 import org.globsframework.utils.Strings;
 import org.globsframework.utils.exceptions.ResourceAccessFailed;
-import org.globsframework.xml.custom._XmlAsNode;
 
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.time.ZonedDateTime;
 import java.util.List;
 
 public class XmlGlobWriter {
