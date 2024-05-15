@@ -12,13 +12,14 @@ import org.globsframework.utils.exceptions.ItemNotFound;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.List;
+
 import static org.globsframework.model.KeyBuilder.newKey;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
 public class XmlGlobParserTest {
     private GlobRepository repository;
-
 
     @Before
     public void setUp() throws Exception {
@@ -29,7 +30,7 @@ public class XmlGlobParserTest {
     @Test
     public void testStandardCase() throws Exception {
         parse("<dummyObject id='1' name='foo'/>");
-        GlobList objects = repository.getAll(DummyObject.TYPE);
+        List<Glob> objects = repository.getAll(DummyObject.TYPE);
         assertEquals(1, objects.size());
         Glob object = objects.get(0);
         assertEquals(1, object.get(DummyObject.ID).intValue());
@@ -51,7 +52,7 @@ public class XmlGlobParserTest {
     @Test
     public void testGeneratesIntegerIdsIfNeeded() throws Exception {
         parse("<dummyObject name='foo'/>");
-        GlobList objects = repository.getAll(DummyObject.TYPE);
+        List<Glob> objects = repository.getAll(DummyObject.TYPE);
         assertEquals(1, objects.size());
         Glob object = objects.get(0);
         assertEquals(100, object.get(DummyObject.ID).intValue());
@@ -194,7 +195,7 @@ public class XmlGlobParserTest {
                          "<dummyObject id='2' undefined='toto'/>" +
                          "");
 
-        GlobList objects = repository.getAll(DummyObject.TYPE);
+        List<Glob> objects = repository.getAll(DummyObject.TYPE);
         assertEquals(2, objects.size());
         repository.get(KeyBuilder.newKey(DummyObject.TYPE, 1));
         repository.get(KeyBuilder.newKey(DummyObject.TYPE, 2));
