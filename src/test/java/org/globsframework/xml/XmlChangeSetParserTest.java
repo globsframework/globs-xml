@@ -24,7 +24,7 @@ public class XmlChangeSetParserTest {
         ));
 
         assertEquals(3, changeSet.getChangeCount(DummyObject.TYPE));
-        changeSet.visit(new ChangeSetVisitor() {
+        changeSet.accept(new ChangeSetVisitor() {
             public void visitCreation(Key key, FieldsValueScanner values) throws Exception {
                 assertEquals(1, key.get(DummyObject.ID).intValue());
                 assertEquals(8, values.size());
