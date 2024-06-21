@@ -377,11 +377,11 @@ public class XmlGlobReader {
             for (Field field : globType.getFields()) {
                 String xmlName = XmlGlobWriter.getXmlName(field);
                 if (field.hasAnnotation(_XmlAsNode.UNIQUE_KEY) || !field.getDataType().isPrimive()) {
-                    fieldAsNode.put(xmlName, field.safeVisit(new FieldModelVisitor(this.nodeModelService)).manageFieldNode);
+                    fieldAsNode.put(xmlName, field.safeAccept(new FieldModelVisitor(this.nodeModelService)).manageFieldNode);
                 } else if (field.hasAnnotation(_XmlValue.UNIQUE_KEY)) {
-                    valueUpdated = field.safeVisit(new ConvertFieldAsAttrVisitor()).updateFromStr;
+                    valueUpdated = field.safeAccept(new ConvertFieldAsAttrVisitor()).updateFromStr;
                 } else {
-                    fieldAsAttribute.add(field.safeVisit(new ManagedFieldAsAttrVisitor(xmlName)).manageFieldAttr);
+                    fieldAsAttribute.add(field.safeAccept(new ManagedFieldAsAttrVisitor(xmlName)).manageFieldAttr);
                 }
             }
         }
