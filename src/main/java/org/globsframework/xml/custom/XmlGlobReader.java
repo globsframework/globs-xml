@@ -1,13 +1,12 @@
 package org.globsframework.xml.custom;
 
-import org.globsframework.metamodel.fields.Field;
-import org.globsframework.metamodel.GlobType;
-import org.globsframework.metamodel.fields.*;
-import org.globsframework.model.Glob;
-import org.globsframework.model.MutableGlob;
+import org.globsframework.core.metamodel.GlobType;
+import org.globsframework.core.metamodel.fields.*;
+import org.globsframework.core.model.Glob;
+import org.globsframework.core.model.MutableGlob;
+import org.globsframework.core.utils.Strings;
 import org.globsframework.saxstack.parser.*;
 import org.globsframework.saxstack.utils.XmlUtils;
-import org.globsframework.utils.Strings;
 import org.globsframework.xml.XmlGlobWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -75,8 +74,7 @@ public class XmlGlobReader {
                     String[] strings = mutableGlob.get(field);
                     if (strings == null) {
                         mutableGlob.set(field, new String[]{value});
-                    }
-                    else {
+                    } else {
                         strings = Arrays.copyOf(strings, strings.length + 1);
                         strings[strings.length - 1] = value;
                         mutableGlob.set(field, strings);

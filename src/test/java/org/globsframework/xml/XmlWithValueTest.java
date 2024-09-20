@@ -1,6 +1,6 @@
 package org.globsframework.xml;
 
-import org.globsframework.model.Glob;
+import org.globsframework.core.model.Glob;
 import org.globsframework.xml.custom.XmlGlobBuilder;
 import org.globsframework.xml.custom.XmlGlobReader;
 import org.globsframework.xml.structured.DataWithMixValue;
@@ -36,7 +36,7 @@ public class XmlWithValueTest {
         XmlGlobBuilder.write(actual, writer);
         String date = DateTimeFormatter.ISO_DATE_TIME.format(actual.get(RootWithValue.dataWithValue).get(DataWithMixValue.correctDate));
         Assert.assertEquals("<rootWithValue><dataWithValue valueAsAttr=\"attrValue\" valueAsAttrDouble=\"3.14\" valueAsAttrDateTime=\"2011-12-03T10:15:30\"" +
-                " correctDate=\""+ date + "\">value</dataWithValue></rootWithValue>", writer.toString());
+                " correctDate=\"" + date + "\">value</dataWithValue></rootWithValue>", writer.toString());
     }
 
 
@@ -44,11 +44,11 @@ public class XmlWithValueTest {
     public void withArrayValue() throws IOException {
         Glob actual = XmlGlobReader.read(kind -> RootWithValue.TYPE, new StringReader(
                 "<root>" +
-                "  <dataWithValue>" +
-                "    <array>AAA</array>" +
-                "    <array>BBB</array>" +
-                "   </dataWithValue> " +
-                "</root>"
+                        "  <dataWithValue>" +
+                        "    <array>AAA</array>" +
+                        "    <array>BBB</array>" +
+                        "   </dataWithValue> " +
+                        "</root>"
         ));
 
         Assert.assertEquals(2, actual.get(RootWithValue.dataWithValue).get(DataWithMixValue.array).length);

@@ -1,11 +1,11 @@
 package org.globsframework.xml;
 
-import org.globsframework.metamodel.fields.Field;
-import org.globsframework.metamodel.GlobModel;
-import org.globsframework.metamodel.GlobType;
-import org.globsframework.model.MutableGlob;
-import org.globsframework.model.impl.DefaultGlob;
-import org.globsframework.utils.exceptions.InvalidParameter;
+import org.globsframework.core.metamodel.GlobModel;
+import org.globsframework.core.metamodel.GlobType;
+import org.globsframework.core.metamodel.fields.Field;
+import org.globsframework.core.model.MutableGlob;
+import org.globsframework.core.model.impl.DefaultGlob;
+import org.globsframework.core.utils.exceptions.InvalidParameter;
 import org.xml.sax.Attributes;
 
 public class XmlSingleGlobParser {

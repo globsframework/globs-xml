@@ -1,17 +1,17 @@
 package org.globsframework.xml;
 
-import org.globsframework.metamodel.fields.Field;
-import org.globsframework.metamodel.GlobModel;
-import org.globsframework.metamodel.GlobType;
-import org.globsframework.metamodel.annotations.FieldNameAnnotationType;
-import org.globsframework.metamodel.fields.IntegerField;
-import org.globsframework.metamodel.links.FieldMappingFunction;
-import org.globsframework.metamodel.links.Link;
-import org.globsframework.metamodel.utils.GlobTypeUtils;
-import org.globsframework.model.*;
+import org.globsframework.core.metamodel.GlobModel;
+import org.globsframework.core.metamodel.GlobType;
+import org.globsframework.core.metamodel.annotations.FieldNameAnnotationType;
+import org.globsframework.core.metamodel.fields.Field;
+import org.globsframework.core.metamodel.fields.IntegerField;
+import org.globsframework.core.metamodel.links.FieldMappingFunction;
+import org.globsframework.core.metamodel.links.Link;
+import org.globsframework.core.metamodel.utils.GlobTypeUtils;
+import org.globsframework.core.model.*;
+import org.globsframework.core.utils.exceptions.*;
 import org.globsframework.saxstack.parser.*;
 import org.globsframework.saxstack.utils.XmlUtils;
-import org.globsframework.utils.exceptions.*;
 import org.xml.sax.Attributes;
 
 import java.io.Reader;
@@ -41,8 +41,7 @@ public class XmlGlobParser {
         repository.startChangeSet();
         try {
             SaxStackParser.parse(XmlUtils.getXmlReader(), new XmlBootstrapNode(new RootProxyNode(), rootTag), reader);
-        }
-        finally {
+        } finally {
             repository.completeChangeSet();
         }
     }
@@ -62,11 +61,9 @@ public class XmlGlobParser {
             try {
                 Glob glob = parse(childName, xmlAttrs);
                 return new RootProxyNode(glob);
-            }
-            catch (RuntimeException e) {
+            } catch (RuntimeException e) {
                 throw e;
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 throw new ExceptionHolder(e);
             }
         }
@@ -84,12 +81,10 @@ public class XmlGlobParser {
                     return repository.create(globType, builder.toArray());
                 }
                 return repository.findOrCreate(KeyBuilder.createFromValues(globType, builder.get()), builder.toArray());
-            }
-            catch (TypeNotFound | ItemNotFound | MissingInfo | ItemAlreadyExists found) {
+            } catch (TypeNotFound | ItemNotFound | MissingInfo | ItemAlreadyExists found) {
                 if (ignoreError) {
                     return null;
-                }
-                else {
+                } else {
                     throw found;
                 }
             }
@@ -100,7 +95,7 @@ public class XmlGlobParser {
             if (keyFields.length == 1) {
                 Field keyField = keyFields[0];
                 if (IntegerField.class.isInstance(keyField)) {
-                    IntegerField integerField = (IntegerField)keyField;
+                    IntegerField integerField = (IntegerField) keyField;
                     if (!builder.contains(integerField)) {
                         return true;
                     }
@@ -115,14 +110,14 @@ public class XmlGlobParser {
                 if (link.getTargetType().equals(parent.getType())) {
                     if (linkToUse != null) {
                         throw new ItemAmbiguity("More than one Link from " + globType.getName() + " to " +
-                                                parent.getType().getName() + " - XML containment cannot be used");
+                                parent.getType().getName() + " - XML containment cannot be used");
                     }
                     linkToUse = link;
                 }
             }
             if (linkToUse == null) {
                 throw new ItemNotFound("There are no links from " + globType.getName() + " to " +
-                                       parent.getType().getName() + " - XML containment cannot be used");
+                        parent.getType().getName() + " - XML containment cannot be used");
             }
             linkToUse.apply(new FieldMappingFunction() {
                 public void process(Field sourceField, Field targetField) {
@@ -146,8 +141,7 @@ public class XmlGlobParser {
                         if (!annotation.get(FieldNameAnnotationType.NAME).equals(xmlAttrName)) {
                             field = findFieldByAnnotation(globType, xmlAttrName);
                         }
-                    }
-                    else{
+                    } else {
                         Glob annotation = field.getAnnotation(FieldNameAnnotationType.UNIQUE_KEY);
                         if (annotation != null) {
                             field = findFieldByAnnotation(globType, xmlAttrName);
@@ -186,7 +180,7 @@ public class XmlGlobParser {
                 }
 
                 throw new InvalidParameter(
-                    "Unknown field or link '" + xmlAttrName + "' for type '" + globType.getName() + "'");
+                        "Unknown field or link '" + xmlAttrName + "' for type '" + globType.getName() + "'");
             }
         }
 
@@ -202,13 +196,13 @@ public class XmlGlobParser {
             final Field namingField = GlobTypeUtils.findNamingField(targetType);
             if (namingField == null) {
                 throw new InvalidParameter("Target type '" + targetType.getName() +
-                                           "' for link '" + link.getName() + "' has no naming field");
+                        "' for link '" + link.getName() + "' has no naming field");
             }
             final Glob targetGlob =
-                repository.findUnique(targetType, new FieldValue(namingField, xmlValue));
+                    repository.findUnique(targetType, new FieldValue(namingField, xmlValue));
             if (targetGlob == null) {
                 throw new InvalidParameter("No target of type '" + targetType.getName() + "' found with "
-                                           + namingField.getName() + "=" + xmlValue + " for link " + link);
+                        + namingField.getName() + "=" + xmlValue + " for link " + link);
             }
 
             link.apply((sourceField, targetField) -> fieldValuesBuilder.setValue(sourceField, targetGlob.getValue(targetField)));

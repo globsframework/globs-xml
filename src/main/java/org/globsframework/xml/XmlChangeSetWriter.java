@@ -1,9 +1,9 @@
 package org.globsframework.xml;
 
-import org.globsframework.metamodel.GlobType;
-import org.globsframework.model.ChangeSet;
-import org.globsframework.model.ChangeSetVisitor;
-import org.globsframework.model.Key;
+import org.globsframework.core.metamodel.GlobType;
+import org.globsframework.core.model.ChangeSet;
+import org.globsframework.core.model.ChangeSetVisitor;
+import org.globsframework.core.model.Key;
 
 import java.io.IOException;
 import java.io.Writer;
@@ -45,8 +45,7 @@ public class XmlChangeSetWriter {
         visitor.complete();
         try {
             writer.flush();
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }

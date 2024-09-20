@@ -1,11 +1,12 @@
 package org.globsframework.xml;
 
-import org.globsframework.metamodel.DummyModel;
-import org.globsframework.metamodel.DummyObject;
-import org.globsframework.model.*;
-import org.globsframework.utils.TestUtils;
-import org.globsframework.utils.exceptions.InvalidParameter;
-import org.globsframework.utils.exceptions.ItemNotFound;
+import org.globsframework.core.metamodel.DummyModel;
+import org.globsframework.core.metamodel.DummyObject;
+import org.globsframework.core.model.*;
+import org.globsframework.core.utils.TestUtils;
+import org.globsframework.core.utils.exceptions.InvalidParameter;
+import org.globsframework.core.utils.exceptions.ItemNotFound;
+import org.globsframework.core.xml.XmlChangeSetParser;
 import org.junit.Test;
 
 import java.io.StringReader;
@@ -15,12 +16,12 @@ import static org.junit.Assert.*;
 public class XmlChangeSetParserTest {
     @Test
     public void testStandardCase() throws Exception {
-        ChangeSet changeSet = XmlChangeSetParser.parse(DummyModel.get(), new StringReader(
-            "<changes>"
-            + "  <create type='dummyObject' id='1' name='name1' value='2.0' present='true'/>"
-            + "  <update type='dummyObject' id='2' name='newName' _name='previousName'/>"
-            + "  <delete type='dummyObject' id='3' _name='name3'/>"
-            + "</changes>"
+        ChangeSet changeSet = org.globsframework.core.xml.XmlChangeSetParser.parse(DummyModel.get(), new StringReader(
+                "<changes>"
+                        + "  <create type='dummyObject' id='1' name='name1' value='2.0' present='true'/>"
+                        + "  <update type='dummyObject' id='2' name='newName' _name='previousName'/>"
+                        + "  <delete type='dummyObject' id='3' _name='name3'/>"
+                        + "</changes>"
         ));
 
         assertEquals(3, changeSet.getChangeCount(DummyObject.TYPE));
@@ -56,42 +57,39 @@ public class XmlChangeSetParserTest {
 
     public void testMissingType() throws Exception {
         try {
-            XmlChangeSetParser.parse(DummyModel.get(), new StringReader(
-                "<changes>"
-                + "  <create id='2' name='name1'/>"
-                + "</changes>"
+            org.globsframework.core.xml.XmlChangeSetParser.parse(DummyModel.get(), new StringReader(
+                    "<changes>"
+                            + "  <create id='2' name='name1'/>"
+                            + "</changes>"
             ));
             fail();
-        }
-        catch (InvalidParameter e) {
+        } catch (InvalidParameter e) {
             assertEquals("Missing attribute 'type' in tag 'create'", e.getMessage());
         }
     }
 
     public void testWrongType() throws Exception {
         try {
-            XmlChangeSetParser.parse(DummyModel.get(), new StringReader(
-                "<changes>"
-                + "  <create type='unknown' id='2' name='name1'/>"
-                + "</changes>"
+            org.globsframework.core.xml.XmlChangeSetParser.parse(DummyModel.get(), new StringReader(
+                    "<changes>"
+                            + "  <create type='unknown' id='2' name='name1'/>"
+                            + "</changes>"
             ));
             fail();
-        }
-        catch (ItemNotFound e) {
+        } catch (ItemNotFound e) {
             assertEquals("No object type found with name: unknown", e.getMessage());
         }
     }
 
     public void testUnknownField() throws Exception {
         try {
-            XmlChangeSetParser.parse(DummyModel.get(), new StringReader(
-                "<changes>"
-                + "  <create type='dummyObject' id='2' toto='name1'/>"
-                + "</changes>"
+            org.globsframework.core.xml.XmlChangeSetParser.parse(DummyModel.get(), new StringReader(
+                    "<changes>"
+                            + "  <create type='dummyObject' id='2' toto='name1'/>"
+                            + "</changes>"
             ));
             fail();
-        }
-        catch (ItemNotFound e) {
+        } catch (ItemNotFound e) {
             assertEquals("Unknown field 'toto' for type 'dummyObject'", e.getMessage());
         }
     }
@@ -99,13 +97,12 @@ public class XmlChangeSetParserTest {
     public void testInvalidValue() throws Exception {
         try {
             XmlChangeSetParser.parse(DummyModel.get(), new StringReader(
-                "<changes>"
-                + "  <create type='dummyObject' id='2' value='toto'/>"
-                + "</changes>"
+                    "<changes>"
+                            + "  <create type='dummyObject' id='2' value='toto'/>"
+                            + "</changes>"
             ));
             fail();
-        }
-        catch (InvalidParameter e) {
+        } catch (InvalidParameter e) {
             assertEquals("'toto' is not a proper value for field 'value' in type 'dummyObject'", e.getMessage());
         }
     }

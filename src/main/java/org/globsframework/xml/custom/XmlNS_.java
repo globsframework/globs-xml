@@ -1,6 +1,6 @@
 package org.globsframework.xml.custom;
 
-import org.globsframework.metamodel.GlobType;
+import org.globsframework.core.metamodel.GlobType;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -13,7 +13,9 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 public @interface XmlNS_ {
     String name() default "";
+
     String url();
+
     GlobType TYPE = XmlNS.TYPE;
 
 }

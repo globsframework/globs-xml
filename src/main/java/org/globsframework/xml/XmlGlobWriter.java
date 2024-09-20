@@ -1,18 +1,18 @@
 package org.globsframework.xml;
 
-import org.globsframework.metamodel.fields.Field;
-import org.globsframework.metamodel.GlobLinkModel;
-import org.globsframework.metamodel.GlobType;
-import org.globsframework.metamodel.annotations.FieldNameAnnotationType;
-import org.globsframework.metamodel.links.Link;
-import org.globsframework.metamodel.links.impl.DefaultDirectSingleLink;
-import org.globsframework.metamodel.utils.EmptyGlobLinkModel;
-import org.globsframework.metamodel.utils.GlobTypeUtils;
-import org.globsframework.model.Glob;
-import org.globsframework.model.GlobRepository;
+import org.globsframework.core.metamodel.GlobLinkModel;
+import org.globsframework.core.metamodel.GlobType;
+import org.globsframework.core.metamodel.annotations.FieldNameAnnotationType;
+import org.globsframework.core.metamodel.fields.Field;
+import org.globsframework.core.metamodel.links.Link;
+import org.globsframework.core.metamodel.links.impl.DefaultDirectSingleLink;
+import org.globsframework.core.metamodel.utils.EmptyGlobLinkModel;
+import org.globsframework.core.metamodel.utils.GlobTypeUtils;
+import org.globsframework.core.model.Glob;
+import org.globsframework.core.model.GlobRepository;
+import org.globsframework.core.utils.Strings;
+import org.globsframework.core.utils.exceptions.ResourceAccessFailed;
 import org.globsframework.saxstack.utils.XmlUtils;
-import org.globsframework.utils.Strings;
-import org.globsframework.utils.exceptions.ResourceAccessFailed;
 
 import java.io.IOException;
 import java.io.OutputStream;

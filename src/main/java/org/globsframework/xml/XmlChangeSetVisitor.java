@@ -1,6 +1,6 @@
 package org.globsframework.xml;
 
-import org.globsframework.model.*;
+import org.globsframework.core.model.*;
 import org.globsframework.saxstack.writer.PrettyPrintRootXmlTag;
 import org.globsframework.saxstack.writer.RootXmlTag;
 import org.globsframework.saxstack.writer.XmlTag;

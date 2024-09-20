@@ -1,8 +1,7 @@
 package org.globsframework.xml;
 
-import org.globsframework.metamodel.fields.Field;
-import org.globsframework.metamodel.fields.*;
-import org.globsframework.utils.exceptions.InvalidParameter;
+import org.globsframework.core.metamodel.fields.*;
+import org.globsframework.core.utils.exceptions.InvalidParameter;
 
 import java.text.*;
 import java.util.Date;
@@ -10,7 +9,7 @@ import java.util.Locale;
 
 public class FieldConverter {
     private static final DecimalFormat DECIMAL_FORMAT = new DecimalFormat("0.0#",
-                                                                          new DecimalFormatSymbols(Locale.US));
+            new DecimalFormatSymbols(Locale.US));
     private static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy/MM/dd");
     private static final DateFormat TIMESTAMP_FORMAT = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
 
@@ -44,13 +43,12 @@ public class FieldConverter {
             xmlStringifierVisitor.setStringValue(stringValue);
             field.safeAccept(xmlStringifierVisitor);
             return xmlStringifierVisitor.getValue();
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             if (ignoreError) {
                 return field.getDefaultValue();
             }
             throw new InvalidParameter("'" + stringValue + "' is not a proper value for field '" + field.getName() +
-                                       "' in type '" + field.getGlobType().getName() + "'", e);
+                    "' in type '" + field.getGlobType().getName() + "'", e);
         }
     }
 
@@ -65,8 +63,7 @@ public class FieldConverter {
     public Date toDate(String value) {
         try {
             return dateFormat.parse(value);
-        }
-        catch (ParseException e) {
+        } catch (ParseException e) {
             if (ignoreError) {
                 return null;
             }
@@ -77,8 +74,7 @@ public class FieldConverter {
     public Date toTimestamp(String value) {
         try {
             return TIMESTAMP_FORMAT.parse(value);
-        }
-        catch (ParseException e) {
+        } catch (ParseException e) {
             if (ignoreError) {
                 return null;
             }
@@ -148,35 +144,34 @@ public class FieldConverter {
         }
 
         public void visitBoolean(BooleanField field) throws Exception {
-            if (((Boolean)value)) {
+            if (((Boolean) value)) {
                 stringValue = "true";
-            }
-            else {
+            } else {
                 stringValue = "false";
             }
         }
 
         public void visitBlob(BlobField field) throws Exception {
-            stringValue = new String((byte[])value);
+            stringValue = new String((byte[]) value);
         }
 
         public void visitString(StringField field) throws Exception {
-            stringValue = (String)value;
+            stringValue = (String) value;
         }
 
         public void visitDouble(DoubleField field) throws Exception {
-            if (((Double)value) == 0.0) {
+            if (((Double) value) == 0.0) {
                 stringValue = "0.0";
             }
             stringValue = DECIMAL_FORMAT.format(value);
         }
 
         public void visitInteger(IntegerField field) throws Exception {
-            stringValue = Integer.toString(((Integer)value));
+            stringValue = Integer.toString(((Integer) value));
         }
 
         public void visitLong(LongField field) throws Exception {
-            stringValue = Long.toString(((Long)value));
+            stringValue = Long.toString(((Long) value));
         }
 
     }

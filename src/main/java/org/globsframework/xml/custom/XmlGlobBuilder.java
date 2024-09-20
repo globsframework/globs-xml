@@ -1,9 +1,8 @@
 package org.globsframework.xml.custom;
 
-import org.globsframework.metamodel.fields.Field;
-import org.globsframework.metamodel.GlobType;
-import org.globsframework.metamodel.fields.*;
-import org.globsframework.model.Glob;
+import org.globsframework.core.metamodel.GlobType;
+import org.globsframework.core.metamodel.fields.*;
+import org.globsframework.core.model.Glob;
 import org.globsframework.saxstack.writer.XmlTag;
 import org.globsframework.saxstack.writer.XmlWriter;
 import org.globsframework.xml.XmlGlobWriter;
@@ -13,7 +12,10 @@ import java.io.Writer;
 import java.time.LocalDate;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.ArrayDeque;
+import java.util.Deque;
+import java.util.HashMap;
+import java.util.Map;
 
 public class XmlGlobBuilder {
     private final Map<String, String> nsMapping = new HashMap<>();

@@ -1,17 +1,17 @@
 package org.globsframework.xml;
 
-import org.globsframework.metamodel.fields.Field;
-import org.globsframework.metamodel.GlobModel;
-import org.globsframework.metamodel.GlobType;
-import org.globsframework.model.FieldValuesWithPreviousBuilder;
-import org.globsframework.model.Key;
-import org.globsframework.model.KeyBuilder;
-import org.globsframework.model.delta.DefaultChangeSet;
-import org.globsframework.model.delta.MutableChangeSet;
+import org.globsframework.core.metamodel.GlobModel;
+import org.globsframework.core.metamodel.GlobType;
+import org.globsframework.core.metamodel.fields.Field;
+import org.globsframework.core.model.FieldValuesWithPreviousBuilder;
+import org.globsframework.core.model.Key;
+import org.globsframework.core.model.KeyBuilder;
+import org.globsframework.core.model.delta.DefaultChangeSet;
+import org.globsframework.core.model.delta.MutableChangeSet;
+import org.globsframework.core.utils.exceptions.InvalidParameter;
+import org.globsframework.core.utils.exceptions.ItemNotFound;
 import org.globsframework.saxstack.parser.*;
 import org.globsframework.saxstack.utils.XmlUtils;
-import org.globsframework.utils.exceptions.InvalidParameter;
-import org.globsframework.utils.exceptions.ItemNotFound;
 import org.xml.sax.Attributes;
 
 import java.io.Reader;
@@ -51,12 +51,10 @@ public class XmlChangeSetParser {
             if ("create".equals(childName)) {
                 valuesBuilder.completeForCreate();
                 changeSet.processCreation(key, valuesBuilder.get());
-            }
-            else if ("update".equals(childName)) {
+            } else if ("update".equals(childName)) {
                 valuesBuilder.completeForUpdate();
                 changeSet.processUpdate(key, valuesBuilder.get());
-            }
-            else if ("delete".equals(childName)) {
+            } else if ("delete".equals(childName)) {
                 valuesBuilder.completeForDelete();
                 changeSet.processDeletion(key, valuesBuilder.get().getPreviousValues());
             }
@@ -82,14 +80,12 @@ public class XmlChangeSetParser {
                     Field field = globType.findField(fieldName);
                     Object value = getValue(globType, xmlAttrName, xmlValue, field, true);
                     valuesBuilder.setPreviousValue(field, value);
-                }
-                else {
+                } else {
                     Field field = globType.findField(xmlAttrName);
                     Object value = getValue(globType, xmlAttrName, xmlValue, field, false);
                     if (field.isKeyField()) {
                         keyBuilder.setValue(field, value);
-                    }
-                    else {
+                    } else {
                         valuesBuilder.setValue(field, value);
                     }
                 }
@@ -99,12 +95,12 @@ public class XmlChangeSetParser {
         private Object getValue(GlobType globType, String xmlAttrName, String xmlValue, Field field, boolean isPrevious) {
             if (field == null) {
                 throw new ItemNotFound(
-                    "Unknown field '" + xmlAttrName + "' for type '" + globType.getName() + "'");
+                        "Unknown field '" + xmlAttrName + "' for type '" + globType.getName() + "'");
             }
             Object value = fieldConverter.toObject(field, xmlValue);
             if (isPrevious && field.isKeyField()) {
                 throw new InvalidParameter("Cannot declare previous value for key field '" + field.getName() +
-                                           "' on type: " + globType);
+                        "' on type: " + globType);
             }
             return value;
         }

@@ -1,6 +1,6 @@
 package org.globsframework.xml.custom;
 
-import org.globsframework.metamodel.GlobType;
+import org.globsframework.core.metamodel.GlobType;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -13,6 +13,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 public @interface XmlUseParentNS_ {
     boolean useParent() default true;
+
     GlobType TYPE = XmlUseParentNS.TYPE;
 
 }

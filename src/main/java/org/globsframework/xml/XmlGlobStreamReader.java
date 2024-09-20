@@ -1,18 +1,17 @@
 package org.globsframework.xml;
 
-import org.globsframework.metamodel.fields.Field;
-import org.globsframework.metamodel.GlobModel;
-import org.globsframework.metamodel.GlobType;
-import org.globsframework.metamodel.fields.*;
-import org.globsframework.model.Glob;
-import org.globsframework.model.MutableGlob;
+import org.globsframework.core.metamodel.GlobModel;
+import org.globsframework.core.metamodel.GlobType;
+import org.globsframework.core.metamodel.fields.*;
+import org.globsframework.core.model.Glob;
+import org.globsframework.core.model.MutableGlob;
+import org.globsframework.core.streams.DbStream;
+import org.globsframework.core.streams.accessors.*;
 import org.globsframework.saxstack.parser.DefaultXmlNode;
 import org.globsframework.saxstack.parser.ExceptionHolder;
 import org.globsframework.saxstack.parser.SaxStackParser;
 import org.globsframework.saxstack.parser.XmlNode;
 import org.globsframework.saxstack.utils.XmlUtils;
-import org.globsframework.streams.DbStream;
-import org.globsframework.streams.accessors.*;
 import org.xml.sax.Attributes;
 
 import java.io.StringReader;

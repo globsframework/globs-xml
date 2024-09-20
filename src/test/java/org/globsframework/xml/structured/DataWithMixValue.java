@@ -1,11 +1,11 @@
 package org.globsframework.xml.structured;
 
-import org.globsframework.metamodel.GlobType;
-import org.globsframework.metamodel.GlobTypeLoaderFactory;
-import org.globsframework.metamodel.fields.DateTimeField;
-import org.globsframework.metamodel.fields.DoubleField;
-import org.globsframework.metamodel.fields.StringArrayField;
-import org.globsframework.metamodel.fields.StringField;
+import org.globsframework.core.metamodel.GlobType;
+import org.globsframework.core.metamodel.GlobTypeLoaderFactory;
+import org.globsframework.core.metamodel.fields.DateTimeField;
+import org.globsframework.core.metamodel.fields.DoubleField;
+import org.globsframework.core.metamodel.fields.StringArrayField;
+import org.globsframework.core.metamodel.fields.StringField;
 import org.globsframework.xml.custom.XmlExportDateFormat_;
 import org.globsframework.xml.custom.XmlNode_;
 import org.globsframework.xml.custom.XmlValue_;

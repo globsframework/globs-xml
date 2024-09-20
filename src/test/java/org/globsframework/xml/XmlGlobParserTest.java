@@ -1,20 +1,20 @@
 package org.globsframework.xml;
 
-import org.globsframework.metamodel.*;
-import org.globsframework.metamodel.annotations.KeyField;
-import org.globsframework.metamodel.annotations.Target;
-import org.globsframework.metamodel.fields.IntegerField;
-import org.globsframework.metamodel.links.Link;
-import org.globsframework.model.*;
-import org.globsframework.utils.exceptions.InvalidParameter;
-import org.globsframework.utils.exceptions.ItemAmbiguity;
-import org.globsframework.utils.exceptions.ItemNotFound;
+import org.globsframework.core.metamodel.*;
+import org.globsframework.core.metamodel.annotations.KeyField;
+import org.globsframework.core.metamodel.annotations.Target;
+import org.globsframework.core.metamodel.fields.IntegerField;
+import org.globsframework.core.metamodel.links.Link;
+import org.globsframework.core.model.*;
+import org.globsframework.core.utils.exceptions.InvalidParameter;
+import org.globsframework.core.utils.exceptions.ItemAmbiguity;
+import org.globsframework.core.utils.exceptions.ItemNotFound;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.util.List;
 
-import static org.globsframework.model.KeyBuilder.newKey;
+import static org.globsframework.core.model.KeyBuilder.newKey;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
@@ -42,10 +42,9 @@ public class XmlGlobParserTest {
         try {
             parse("<dummyObject id='thisIsNotAnInt'/>");
             fail();
-        }
-        catch (InvalidParameter e) {
+        } catch (InvalidParameter e) {
             assertEquals("'thisIsNotAnInt' is not a proper value for field 'id' in type 'dummyObject'",
-                         e.getMessage());
+                    e.getMessage());
         }
     }
 
@@ -62,14 +61,14 @@ public class XmlGlobParserTest {
     @Test
     public void testLinkField() throws Exception {
         parse("<dummyObject id='1' name='foo'/>" +
-              "<dummyObject id='2' linkId='1'/>");
+                "<dummyObject id='2' linkId='1'/>");
         assertEquals(getDummyObject(1), repository.findLinkTarget(getDummyObject(2), DummyObject.LINK));
     }
 
     @Test
     public void testLinkFieldWithTargetName() throws Exception {
         parse("<dummyObject id='1' name='foo'/>" +
-              "<dummyObject id='2' linkName='foo'/>");
+                "<dummyObject id='2' linkName='foo'/>");
         Glob obj2 = getDummyObject(2);
         assertEquals(1, obj2.get(DummyObject.LINK_ID).intValue());
         assertEquals(getDummyObject(1), repository.findLinkTarget(obj2, DummyObject.LINK));
@@ -78,15 +77,15 @@ public class XmlGlobParserTest {
     @Test
     public void testIdPartOfLinkFieldTakesPrecedenceOverNamePart() throws Exception {
         parse("<dummyObject id='1' name='foo'/>" +
-              "<dummyObject id='2' name='bar'/>" +
-              "<dummyObject id='3' linkId='2' linkName='foo'/>");
+                "<dummyObject id='2' name='bar'/>" +
+                "<dummyObject id='3' linkId='2' linkName='foo'/>");
         assertEquals(getDummyObject(2), repository.findLinkTarget(getDummyObject(3), DummyObject.LINK));
     }
 
     @Test
     public void testUsingALinkFieldAsAnId() throws Exception {
         parse("<dummyObject id='1' name='foo'/>" +
-              "<dummyObjectWithLinkFieldId linkId='1'/>");
+                "<dummyObjectWithLinkFieldId linkId='1'/>");
         Glob source = repository.get(newKey(DummyObjectWithLinkFieldId.TYPE, 1));
         assertEquals(getDummyObject(1), repository.findLinkTarget(source, DummyObjectWithLinkFieldId.LINK));
     }
@@ -94,7 +93,7 @@ public class XmlGlobParserTest {
     @Test
     public void testUsingANameLinkAsAnId() throws Exception {
         parse("<dummyObject id='1' name='foo'/>" +
-              "<dummyObjectWithLinkFieldId linkName='foo'/>");
+                "<dummyObjectWithLinkFieldId linkName='foo'/>");
         Glob source = repository.get(newKey(DummyObjectWithLinkFieldId.TYPE, 1));
         assertEquals(1, source.get(DummyObjectWithLinkFieldId.LINK_ID).intValue());
         assertEquals(getDummyObject(1), repository.findLinkTarget(source, DummyObjectWithLinkFieldId.LINK));
@@ -103,7 +102,7 @@ public class XmlGlobParserTest {
     @Test
     public void testCompositeLink() throws Exception {
         parse("<dummyObjectWithCompositeKey id1='1' id2='2'/>" +
-              "<dummyObjectWithLinks id='1' targetId1='1' targetId2='2'/>");
+                "<dummyObjectWithLinks id='1' targetId1='1' targetId2='2'/>");
         Glob source = repository.get(newKey(DummyObjectWithLinks.TYPE, 1));
         Glob target = repository.findLinkTarget(source, DummyObjectWithLinks.COMPOSITE_LINK);
         assertEquals(1, target.get(DummyObjectWithCompositeKey.ID1).intValue());
@@ -113,8 +112,8 @@ public class XmlGlobParserTest {
     @Test
     public void testNamePartOfCompositeLinkTakesPrecedenceOverIdPart() throws Exception {
         parse("<dummyObjectWithCompositeKey id1='1' id2='2' name='foo'/>" +
-              "<dummyObjectWithCompositeKey id1='2' id2='3' name='bar'/>" +
-              "<dummyObjectWithLinks id='1' compositeLink='bar' targetId1='1' targetId2='2'/>");
+                "<dummyObjectWithCompositeKey id1='2' id2='3' name='bar'/>" +
+                "<dummyObjectWithLinks id='1' compositeLink='bar' targetId1='1' targetId2='2'/>");
         Glob source = repository.get(newKey(DummyObjectWithLinks.TYPE, 1));
         Glob target = repository.findLinkTarget(source, DummyObjectWithLinks.COMPOSITE_LINK);
         assertEquals(1, target.get(DummyObjectWithCompositeKey.ID1).intValue());
@@ -124,8 +123,8 @@ public class XmlGlobParserTest {
     @Test
     public void testContainmentWithSingleLink() throws Exception {
         parse("<dummyObject id='1'>" +
-              "  <dummyObjectWithLinks id='1'/>" +
-              "</dummyObject>");
+                "  <dummyObjectWithLinks id='1'/>" +
+                "</dummyObject>");
 
         Glob links = repository.get(newKey(DummyObjectWithLinks.TYPE, 1));
         assertEquals(1, links.get(DummyObjectWithLinks.PARENT_ID).intValue());
@@ -134,8 +133,8 @@ public class XmlGlobParserTest {
     @Test
     public void testContainmentWithCompositeLink() throws Exception {
         parse("<dummyObjectWithCompositeKey id1='1' id2='2'>" +
-              "  <dummyObjectWithLinks id='1'/>" +
-              "</dummyObjectWithCompositeKey>");
+                "  <dummyObjectWithLinks id='1'/>" +
+                "</dummyObjectWithCompositeKey>");
 
         Glob links = repository.get(newKey(DummyObjectWithLinks.TYPE, 1));
         assertEquals(1, links.get(DummyObjectWithLinks.TARGET_ID_1).intValue());
@@ -155,8 +154,8 @@ public class XmlGlobParserTest {
         static {
             GlobTypeLoader loader = GlobTypeLoaderFactory.create(AnObjectLinkingToATypeWithNoNamingField.class, true);
             loader.register(MutableGlobLinkModel.LinkRegister.class,
-                            mutableGlobLinkModel ->
-                                OBJ2 = mutableGlobLinkModel.getLinkBuilder(OBJ2)
+                    mutableGlobLinkModel ->
+                            OBJ2 = mutableGlobLinkModel.getLinkBuilder(OBJ2)
                                     .add(OBJ2_ID, DummyObject2.ID).publish());
             loader.load();
         }
@@ -165,9 +164,9 @@ public class XmlGlobParserTest {
     @Test
     public void testUsingALinkFieldWithAnObjectThatHasNoNamingField() throws Exception {
         parse(GlobModelBuilder.create(DummyObject2.TYPE, AnObjectLinkingToATypeWithNoNamingField.TYPE).get(),
-              "<dummyObject2 id='11'>" +
-              "  <anObjectLinkingToATypeWithNoNamingField id='1'/>" +
-              "</dummyObject2>");
+                "<dummyObject2 id='11'>" +
+                        "  <anObjectLinkingToATypeWithNoNamingField id='1'/>" +
+                        "</dummyObject2>");
 
         Glob source = repository.get(newKey(AnObjectLinkingToATypeWithNoNamingField.TYPE, 1));
         assertEquals(11, source.get(AnObjectLinkingToATypeWithNoNamingField.OBJ2_ID).intValue());
@@ -177,23 +176,22 @@ public class XmlGlobParserTest {
     public void testContainmentWithNoRelationshipError() throws Exception {
         try {
             parse("<dummyObject id='1'>" +
-                  "  <dummyObject2 id='1'/>" +
-                  "</dummyObject>");
+                    "  <dummyObject2 id='1'/>" +
+                    "</dummyObject>");
             fail();
-        }
-        catch (ItemNotFound e) {
+        } catch (ItemNotFound e) {
             assertEquals("There are no links from dummyObject2 to dummyObject" +
-                         " - XML containment cannot be used", e.getMessage());
+                    " - XML containment cannot be used", e.getMessage());
         }
     }
 
     @Test
     public void testReadInvalidContent() throws Exception {
         parseIgnoreError("" +
-                         "<dummyObject id='1' count='sdf'/>" +
-                         "<dummyUnknownObject id='1' COUNT='titi'/>" +
-                         "<dummyObject id='2' undefined='toto'/>" +
-                         "");
+                "<dummyObject id='1' count='sdf'/>" +
+                "<dummyUnknownObject id='1' COUNT='titi'/>" +
+                "<dummyObject id='2' undefined='toto'/>" +
+                "");
 
         List<Glob> objects = repository.getAll(DummyObject.TYPE);
         assertEquals(2, objects.size());
@@ -239,15 +237,15 @@ public class XmlGlobParserTest {
         static {
             GlobTypeLoader loader = GlobTypeLoaderFactory.create(AnObjectWithTwoLinks.class, true);
             loader.register(MutableGlobLinkModel.LinkRegister.class,
-                            mutableGlobLinkModel ->
-                            {
-                                mutableGlobLinkModel.getDirectLinkBuilder(LINK1)
-                                    .add(LINK1_ID, AnObject.ID)
-                                    .publish();
-                                mutableGlobLinkModel.getDirectLinkBuilder(LINK2)
-                                    .add(LINK2_ID, AnObject.ID)
-                                    .publish();
-                            });
+                    mutableGlobLinkModel ->
+                    {
+                        mutableGlobLinkModel.getDirectLinkBuilder(LINK1)
+                                .add(LINK1_ID, AnObject.ID)
+                                .publish();
+                        mutableGlobLinkModel.getDirectLinkBuilder(LINK2)
+                                .add(LINK2_ID, AnObject.ID)
+                                .publish();
+                    });
             loader.load();
         }
     }
@@ -256,14 +254,13 @@ public class XmlGlobParserTest {
     public void testContainmentWithTooManyRelationshipsError() throws Exception {
         try {
             parse(GlobModelBuilder.create(AnObject.TYPE, AnObjectWithTwoLinks.TYPE).get(),
-                  "<anObject id='1'>" +
-                  "  <anObjectWithTwoLinks id='1'/>" +
-                  "</anObject>");
+                    "<anObject id='1'>" +
+                            "  <anObjectWithTwoLinks id='1'/>" +
+                            "</anObject>");
             fail();
-        }
-        catch (ItemAmbiguity e) {
+        } catch (ItemAmbiguity e) {
             assertEquals("More than one Link from anObjectWithTwoLinks to anObject" +
-                         " - XML containment cannot be used", e.getMessage());
+                    " - XML containment cannot be used", e.getMessage());
         }
     }
 

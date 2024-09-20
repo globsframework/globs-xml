@@ -1,14 +1,14 @@
 package org.globsframework.xml.custom;
 
-import org.globsframework.metamodel.GlobType;
-import org.globsframework.metamodel.GlobTypeLoaderFactory;
-import org.globsframework.metamodel.annotations.GlobCreateFromAnnotation;
-import org.globsframework.metamodel.annotations.InitUniqueKey;
-import org.globsframework.metamodel.fields.BooleanField;
-import org.globsframework.metamodel.fields.StringField;
-import org.globsframework.model.Key;
-import org.globsframework.model.MutableGlob;
-import org.globsframework.utils.Strings;
+import org.globsframework.core.metamodel.GlobType;
+import org.globsframework.core.metamodel.GlobTypeLoaderFactory;
+import org.globsframework.core.metamodel.annotations.GlobCreateFromAnnotation;
+import org.globsframework.core.metamodel.annotations.InitUniqueKey;
+import org.globsframework.core.metamodel.fields.BooleanField;
+import org.globsframework.core.metamodel.fields.StringField;
+import org.globsframework.core.model.Key;
+import org.globsframework.core.model.MutableGlob;
+import org.globsframework.core.utils.Strings;
 
 public class _XmlAsNode {
     public static GlobType TYPE;
@@ -19,10 +19,11 @@ public class _XmlAsNode {
 
     @InitUniqueKey
     public static Key UNIQUE_KEY;
+
     static {
         GlobTypeLoaderFactory.create(_XmlAsNode.class, "_XmlAsNode")
-        .register(GlobCreateFromAnnotation.class, annotation -> create((XmlNode_) annotation))
-        .load();
+                .register(GlobCreateFromAnnotation.class, annotation -> create((XmlNode_) annotation))
+                .load();
     }
 
     private static MutableGlob create(XmlNode_ annotation) {

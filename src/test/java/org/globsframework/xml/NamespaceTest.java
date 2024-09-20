@@ -1,12 +1,12 @@
 package org.globsframework.xml;
 
-import org.globsframework.metamodel.GlobType;
-import org.globsframework.metamodel.GlobTypeLoaderFactory;
-import org.globsframework.metamodel.annotations.FieldNameAnnotation;
-import org.globsframework.metamodel.annotations.Target;
-import org.globsframework.metamodel.fields.GlobField;
-import org.globsframework.metamodel.fields.StringField;
-import org.globsframework.model.Glob;
+import org.globsframework.core.metamodel.GlobType;
+import org.globsframework.core.metamodel.GlobTypeLoaderFactory;
+import org.globsframework.core.metamodel.annotations.FieldNameAnnotation;
+import org.globsframework.core.metamodel.annotations.Target;
+import org.globsframework.core.metamodel.fields.GlobField;
+import org.globsframework.core.metamodel.fields.StringField;
+import org.globsframework.core.model.Glob;
 import org.globsframework.xml.custom.*;
 import org.junit.Assert;
 import org.junit.Test;
@@ -22,10 +22,10 @@ public class NamespaceTest {
         String text2 = "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:ns=\"http://www.cegid.fr/Retail/1.0\">\n" +
                 "   <soapenv:Body>\n" +
                 "      <ns:GetCustomerDetail>\n" +
-                       "         <ns:customerId>001000000018</ns:customerId>\n" +
-                       "  <ns:priosWithParentNS xmlns:prios=\"http://www.cegid.fr/Retail/1.0\">" +
-                       "         <prios:customerId>001000000018</prios:customerId>\n" +
-                       "    </ns:priosWithParentNS>" +
+                "         <ns:customerId>001000000018</ns:customerId>\n" +
+                "  <ns:priosWithParentNS xmlns:prios=\"http://www.cegid.fr/Retail/1.0\">" +
+                "         <prios:customerId>001000000018</prios:customerId>\n" +
+                "    </ns:priosWithParentNS>" +
                 "      </ns:GetCustomerDetail>\n" +
                 "   </soapenv:Body>\n" +
                 "</soapenv:Envelope>";
@@ -34,10 +34,10 @@ public class NamespaceTest {
                 "   <soapenv:Body>\n" +
                 "      <GetCustomerDetail xmlns=\"http://www.cegid.fr/Retail/1.0\">\n" +
                 "         <customerId>001000000018</customerId>\n" +
-                       "     <priosWithParentNS xmlns:prios=\"http://www.cegid.fr/Retail/1.0\">" +
-                       "         <prios:customerId>001000000018</prios:customerId>\n" +
-                       "    </priosWithParentNS>" +
-                       "      </GetCustomerDetail>\n" +
+                "     <priosWithParentNS xmlns:prios=\"http://www.cegid.fr/Retail/1.0\">" +
+                "         <prios:customerId>001000000018</prios:customerId>\n" +
+                "    </priosWithParentNS>" +
+                "      </GetCustomerDetail>\n" +
                 "   </soapenv:Body>\n" +
                 "</soapenv:Envelope>";
 
