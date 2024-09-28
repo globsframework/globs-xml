@@ -2,7 +2,7 @@ package org.globsframework.xml;
 
 import org.globsframework.core.metamodel.GlobModel;
 import org.globsframework.core.metamodel.GlobType;
-import org.globsframework.core.metamodel.annotations.FieldNameAnnotationType;
+import org.globsframework.core.metamodel.annotations.FieldName;
 import org.globsframework.core.metamodel.fields.Field;
 import org.globsframework.core.metamodel.fields.IntegerField;
 import org.globsframework.core.metamodel.links.FieldMappingFunction;
@@ -136,13 +136,13 @@ public class XmlGlobParser {
 
                 Field field = globType.findField(xmlAttrName);
                 if (field != null) {
-                    if (field.hasAnnotation(FieldNameAnnotationType.UNIQUE_KEY)) {
-                        Glob annotation = field.getAnnotation(FieldNameAnnotationType.UNIQUE_KEY);
-                        if (!annotation.get(FieldNameAnnotationType.NAME).equals(xmlAttrName)) {
+                    if (field.hasAnnotation(FieldName.UNIQUE_KEY)) {
+                        Glob annotation = field.getAnnotation(FieldName.UNIQUE_KEY);
+                        if (!annotation.get(FieldName.NAME).equals(xmlAttrName)) {
                             field = findFieldByAnnotation(globType, xmlAttrName);
                         }
                     } else {
-                        Glob annotation = field.getAnnotation(FieldNameAnnotationType.UNIQUE_KEY);
+                        Glob annotation = field.getAnnotation(FieldName.UNIQUE_KEY);
                         if (annotation != null) {
                             field = findFieldByAnnotation(globType, xmlAttrName);
                         }
@@ -242,9 +242,9 @@ public class XmlGlobParser {
 
     private Field findFieldByAnnotation(GlobType type, String xmlAttrName) {
         for (Field field : type.getFields()) {
-            Glob annotation = field.getAnnotation(FieldNameAnnotationType.UNIQUE_KEY);
+            Glob annotation = field.getAnnotation(FieldName.UNIQUE_KEY);
             if (annotation != null) {
-                if (annotation.get(FieldNameAnnotationType.NAME).equals(xmlAttrName)) {
+                if (annotation.get(FieldName.NAME).equals(xmlAttrName)) {
                     return field;
                 }
             }

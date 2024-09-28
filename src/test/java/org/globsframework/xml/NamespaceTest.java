@@ -2,7 +2,7 @@ package org.globsframework.xml;
 
 import org.globsframework.core.metamodel.GlobType;
 import org.globsframework.core.metamodel.GlobTypeLoaderFactory;
-import org.globsframework.core.metamodel.annotations.FieldNameAnnotation;
+import org.globsframework.core.metamodel.annotations.FieldName_;
 import org.globsframework.core.metamodel.annotations.Target;
 import org.globsframework.core.metamodel.fields.GlobField;
 import org.globsframework.core.metamodel.fields.StringField;
@@ -64,10 +64,10 @@ public class NamespaceTest {
         public static GlobType TYPE;
 
         @XmlNode_(mandatory = true)
-        @FieldNameAnnotation("Header")
+        @FieldName_("Header")
         public static StringField header;
 
-        @FieldNameAnnotation("Body")
+        @FieldName_("Body")
         @Target(Y2SoapBodyType.class)
         public static GlobField body;
 
@@ -79,7 +79,7 @@ public class NamespaceTest {
     public static class Y2SoapBodyType {
         public static GlobType TYPE;
 
-        @FieldNameAnnotation("GetCustomerDetail")
+        @FieldName_("GetCustomerDetail")
         @Target(Y2GetCustomerDetailRequest.class)
         public static GlobField getCustomerDetailRequest;
 
@@ -93,7 +93,7 @@ public class NamespaceTest {
         public static GlobType TYPE;
 
         @XmlNode_
-        @FieldNameAnnotation("customerId")
+        @FieldName_("customerId")
         public static StringField customerId;
 
         @Target(PriosOtherDetailRequest.class)
@@ -112,7 +112,7 @@ public class NamespaceTest {
         public static GlobType TYPE;
 
         @XmlNode_
-        @FieldNameAnnotation("customerId")
+        @FieldName_("customerId")
         public static StringField customerId;
 
         static {

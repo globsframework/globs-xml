@@ -2,7 +2,7 @@ package org.globsframework.xml;
 
 import org.globsframework.core.metamodel.GlobLinkModel;
 import org.globsframework.core.metamodel.GlobType;
-import org.globsframework.core.metamodel.annotations.FieldNameAnnotationType;
+import org.globsframework.core.metamodel.annotations.FieldName;
 import org.globsframework.core.metamodel.fields.Field;
 import org.globsframework.core.metamodel.links.Link;
 import org.globsframework.core.metamodel.links.impl.DefaultDirectSingleLink;
@@ -62,7 +62,7 @@ public class XmlGlobWriter {
     }
 
     public static String getXmlName(Field field) {
-        return FieldNameAnnotationType.getName(field);
+        return FieldName.getName(field);
     }
 
     private static List<Glob> getChildren(final Glob target, final GlobRepository repository, GlobLinkModel globLinkModel) {
