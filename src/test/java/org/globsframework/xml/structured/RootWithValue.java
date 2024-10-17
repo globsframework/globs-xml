@@ -12,6 +12,6 @@ public class RootWithValue {
     public static GlobField dataWithValue;
 
     static {
-        GlobTypeLoaderFactory.create(RootWithValue.class).load();
+        GlobTypeLoaderFactory.create(RootWithValue.class, true).load();
     }
 }
