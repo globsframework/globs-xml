@@ -12,5 +12,5 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Target({ElementType.FIELD})
 
 public @interface XmlValueAsCData_ {
-    GlobType TYPE = _XmlValueAsCData.TYPE;
+    GlobType TYPE = XmlValueAsCData.TYPE;
 }

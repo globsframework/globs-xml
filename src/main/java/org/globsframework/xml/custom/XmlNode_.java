@@ -16,6 +16,6 @@ public @interface XmlNode_ {
 
     boolean mandatory() default false;
 
-    GlobType TYPE = _XmlAsNode.TYPE;
+    GlobType TYPE = XmlAsNode.TYPE;
 
 }

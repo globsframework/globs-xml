@@ -10,7 +10,7 @@ import org.globsframework.core.model.Key;
 import org.globsframework.core.model.MutableGlob;
 import org.globsframework.core.utils.Strings;
 
-public class _XmlAsNode {
+public class XmlAsNode {
     public static GlobType TYPE;
 
     public static StringField NAME;
@@ -21,7 +21,7 @@ public class _XmlAsNode {
     public static Key UNIQUE_KEY;
 
     static {
-        GlobTypeLoaderFactory.create(_XmlAsNode.class, "_XmlAsNode")
+        GlobTypeLoaderFactory.create(XmlAsNode.class, "_XmlAsNode")
                 .register(GlobCreateFromAnnotation.class, annotation -> create((XmlNode_) annotation))
                 .load();
     }

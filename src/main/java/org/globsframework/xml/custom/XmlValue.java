@@ -8,7 +8,7 @@ import org.globsframework.core.metamodel.annotations.InitUniqueKey;
 import org.globsframework.core.model.Glob;
 import org.globsframework.core.model.Key;
 
-public class _XmlValue {
+public class XmlValue {
     public static GlobType TYPE;
 
     @InitUniqueKey
@@ -18,7 +18,7 @@ public class _XmlValue {
     public static Glob UNIQUE_GLOB;
 
     static {
-        GlobTypeLoaderFactory.create(_XmlValue.class, "_XmlValue")
+        GlobTypeLoaderFactory.create(XmlValue.class, "_XmlValue")
                 .register(GlobCreateFromAnnotation.class, annotation -> UNIQUE_GLOB)
                 .load();
     }

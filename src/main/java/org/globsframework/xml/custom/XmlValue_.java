@@ -13,6 +13,6 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 public @interface XmlValue_ {
 
-    GlobType TYPE = _XmlValue.TYPE;
+    GlobType TYPE = XmlValue.TYPE;
 
 }

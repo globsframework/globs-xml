@@ -105,11 +105,11 @@ public class XmlGlobBuilder {
         }
 
         private void dumpSimpleValue(Field field, String strValue) throws IOException {
-            if (field.hasAnnotation(_XmlAsNode.UNIQUE_KEY)) {
-                if (strValue != null || field.getAnnotation(_XmlAsNode.UNIQUE_KEY).isTrue(_XmlAsNode.MANDATORY)) {
+            if (field.hasAnnotation(XmlAsNode.UNIQUE_KEY)) {
+                if (strValue != null || field.getAnnotation(XmlAsNode.UNIQUE_KEY).isTrue(XmlAsNode.MANDATORY)) {
                     xmlTag = xmlTag.createChildTag(ns.element().addToTag(XmlGlobWriter.getXmlName(field)));
                     if (strValue != null) {
-                        if (field.hasAnnotation(_XmlValueAsCData.UNIQUE_KEY)) {
+                        if (field.hasAnnotation(XmlValueAsCData.UNIQUE_KEY)) {
                             xmlTag.addCDataValue(strValue);
                         } else {
                             xmlTag.addValue(strValue);
@@ -117,7 +117,7 @@ public class XmlGlobBuilder {
                     }
                     xmlTag = xmlTag.end();
                 }
-            } else if (field.hasAnnotation(_XmlValue.UNIQUE_KEY)) {
+            } else if (field.hasAnnotation(XmlValue.UNIQUE_KEY)) {
                 xmlTag.addValue(strValue);
             } else {
                 if (strValue != null) {
@@ -140,9 +140,9 @@ public class XmlGlobBuilder {
 
         public void visitDate(DateField field, LocalDate value) throws Exception {
             DateTimeFormatter dateTimeFormatter;
-            if (field.hasAnnotation(_XmlExportDateFormat.UNIQUE_KEY)) {
-                Glob annotation = field.getAnnotation(_XmlExportDateFormat.UNIQUE_KEY);
-                dateTimeFormatter = DateTimeFormatter.ofPattern(annotation.get(_XmlExportDateFormat.FORMAT));
+            if (field.hasAnnotation(XmlExportDateFormat.UNIQUE_KEY)) {
+                Glob annotation = field.getAnnotation(XmlExportDateFormat.UNIQUE_KEY);
+                dateTimeFormatter = DateTimeFormatter.ofPattern(annotation.get(XmlExportDateFormat.FORMAT));
             } else {
                 dateTimeFormatter = DateTimeFormatter.ISO_DATE;
             }
@@ -151,9 +151,9 @@ public class XmlGlobBuilder {
 
         public void visitDateTime(DateTimeField field, ZonedDateTime value) throws Exception {
             DateTimeFormatter dateTimeFormatter;
-            if (field.hasAnnotation(_XmlExportDateFormat.UNIQUE_KEY)) {
-                Glob annotation = field.getAnnotation(_XmlExportDateFormat.UNIQUE_KEY);
-                dateTimeFormatter = DateTimeFormatter.ofPattern(annotation.get(_XmlExportDateFormat.FORMAT));
+            if (field.hasAnnotation(XmlExportDateFormat.UNIQUE_KEY)) {
+                Glob annotation = field.getAnnotation(XmlExportDateFormat.UNIQUE_KEY);
+                dateTimeFormatter = DateTimeFormatter.ofPattern(annotation.get(XmlExportDateFormat.FORMAT));
             } else {
                 dateTimeFormatter = DateTimeFormatter.ISO_DATE_TIME;
             }

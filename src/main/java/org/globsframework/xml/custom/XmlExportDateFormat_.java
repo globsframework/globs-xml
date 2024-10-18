@@ -17,6 +17,6 @@ public @interface XmlExportDateFormat_ {
 
     String zoneId() default "";
 
-    GlobType TYPE = _XmlExportDateFormat.TYPE;
+    GlobType TYPE = XmlExportDateFormat.TYPE;
 
 }

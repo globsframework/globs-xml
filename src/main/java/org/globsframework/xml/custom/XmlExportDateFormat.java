@@ -7,7 +7,7 @@ import org.globsframework.core.metamodel.annotations.InitUniqueKey;
 import org.globsframework.core.metamodel.fields.StringField;
 import org.globsframework.core.model.Key;
 
-public class _XmlExportDateFormat {
+public class XmlExportDateFormat {
     public static GlobType TYPE;
 
     public static StringField FORMAT;
@@ -18,7 +18,7 @@ public class _XmlExportDateFormat {
     public static Key UNIQUE_KEY;
 
     static {
-        GlobTypeLoaderFactory.create(_XmlExportDateFormat.class, "XmlExportDateFormat")
+        GlobTypeLoaderFactory.create(XmlExportDateFormat.class, "XmlExportDateFormat")
                 .register(GlobCreateFromAnnotation.class, annotation -> TYPE.instantiate()
                         .set(FORMAT, ((XmlExportDateFormat_) annotation).value())
                         .set(ZONE_ID, ((XmlExportDateFormat_) annotation).zoneId())

@@ -286,9 +286,9 @@ public class XmlGlobReader {
 
         DateConverter(DateField field) {
             this.field = field;
-            Glob dataFormat = field.findAnnotation(_XmlExportDateFormat.UNIQUE_KEY);
+            Glob dataFormat = field.findAnnotation(XmlExportDateFormat.UNIQUE_KEY);
             if (dataFormat != null) {
-                String s = dataFormat.get(_XmlExportDateFormat.FORMAT);
+                String s = dataFormat.get(XmlExportDateFormat.FORMAT);
                 dateTimeFormatter = DateTimeFormatter.ofPattern(s);
             } else {
                 dateTimeFormatter = DateTimeFormatter.ISO_DATE;
@@ -322,10 +322,10 @@ public class XmlGlobReader {
 
         DateTimeConverter(DateTimeField field) {
             this.field = field;
-            Glob dataFormat = field.findAnnotation(_XmlExportDateFormat.UNIQUE_KEY);
+            Glob dataFormat = field.findAnnotation(XmlExportDateFormat.UNIQUE_KEY);
             if (dataFormat != null) {
-                String s = dataFormat.get(_XmlExportDateFormat.FORMAT);
-                zoneId = ZoneId.of(dataFormat.get(_XmlExportDateFormat.ZONE_ID, ZoneId.systemDefault().getId()));
+                String s = dataFormat.get(XmlExportDateFormat.FORMAT);
+                zoneId = ZoneId.of(dataFormat.get(XmlExportDateFormat.ZONE_ID, ZoneId.systemDefault().getId()));
                 dateTimeFormatter = DateTimeFormatter.ofPattern(s).withZone(zoneId);
             } else {
                 zoneId = ZoneId.systemDefault();
@@ -374,9 +374,9 @@ public class XmlGlobReader {
             this.globType = globType;
             for (Field field : globType.getFields()) {
                 String xmlName = XmlGlobWriter.getXmlName(field);
-                if (field.hasAnnotation(_XmlAsNode.UNIQUE_KEY) || !field.getDataType().isPrimive()) {
+                if (field.hasAnnotation(XmlAsNode.UNIQUE_KEY) || !field.getDataType().isPrimive()) {
                     fieldAsNode.put(xmlName, field.safeAccept(new FieldModelVisitor(this.nodeModelService)).manageFieldNode);
-                } else if (field.hasAnnotation(_XmlValue.UNIQUE_KEY)) {
+                } else if (field.hasAnnotation(XmlValue.UNIQUE_KEY)) {
                     valueUpdated = field.safeAccept(new ConvertFieldAsAttrVisitor()).updateFromStr;
                 } else {
                     fieldAsAttribute.add(field.safeAccept(new ManagedFieldAsAttrVisitor(xmlName)).manageFieldAttr);
