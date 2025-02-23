@@ -1,25 +1,34 @@
 package org.globsframework.xml.custom;
 
 import org.globsframework.core.metamodel.GlobType;
-import org.globsframework.core.metamodel.GlobTypeLoaderFactory;
+import org.globsframework.core.metamodel.GlobTypeBuilder;
+import org.globsframework.core.metamodel.GlobTypeBuilderFactory;
 import org.globsframework.core.metamodel.annotations.GlobCreateFromAnnotation;
 import org.globsframework.core.metamodel.annotations.InitUniqueKey;
 import org.globsframework.core.metamodel.fields.BooleanField;
 import org.globsframework.core.model.Key;
+import org.globsframework.core.model.KeyBuilder;
 import org.globsframework.core.model.MutableGlob;
 
 public class XmlUseParentNS {
-    public static GlobType TYPE;
+    public static final GlobType TYPE;
 
-    public static BooleanField useParent;
+    public static final BooleanField useParent;
 
     @InitUniqueKey
-    public static Key UNIQUE_KEY;
+    public static final Key UNIQUE_KEY;
 
     static {
-        GlobTypeLoaderFactory.create(XmlUseParentNS.class, "XmlUseParentNS")
-                .register(GlobCreateFromAnnotation.class, annotation -> create((XmlUseParentNS_) annotation))
-                .load();
+        GlobTypeBuilder typeBuilder = GlobTypeBuilderFactory.create("XmlUseParentNS");
+        TYPE = typeBuilder.unCompleteType();
+        useParent = typeBuilder.declareBooleanField("useParent");
+        typeBuilder.complete();
+        UNIQUE_KEY = KeyBuilder.newEmptyKey(TYPE);
+        typeBuilder.register(GlobCreateFromAnnotation.class, annotation -> create((XmlUseParentNS_) annotation));
+
+//        GlobTypeLoaderFactory.create(XmlUseParentNS.class, "XmlUseParentNS")
+//                .register(GlobCreateFromAnnotation.class, annotation -> create((XmlUseParentNS_) annotation))
+//                .load();
     }
 
     private static MutableGlob create(XmlUseParentNS_ annotation) {
