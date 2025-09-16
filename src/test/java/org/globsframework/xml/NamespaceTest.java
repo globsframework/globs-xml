@@ -8,12 +8,13 @@ import org.globsframework.core.metamodel.fields.GlobField;
 import org.globsframework.core.metamodel.fields.StringField;
 import org.globsframework.core.model.Glob;
 import org.globsframework.xml.custom.*;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class NamespaceTest {
 
@@ -44,7 +45,7 @@ public class NamespaceTest {
         Glob glob1 = XmlGlobReader.read(kind -> Y2EnvelopeType.TYPE, new StringReader(text2));
         Glob glob2 = XmlGlobReader.read(kind -> Y2EnvelopeType.TYPE, new StringReader(text3));
 
-        Assert.assertTrue(glob1.matches(glob2));
+        assertTrue(glob1.matches(glob2));
 
         StringWriter writer = new StringWriter();
         XmlGlobBuilder.write(glob1, writer);

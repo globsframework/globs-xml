@@ -8,8 +8,7 @@ import org.globsframework.core.model.GlobRepository;
 import org.globsframework.core.model.GlobRepositoryBuilder;
 import org.globsframework.core.model.GlobTestUtils;
 import org.globsframework.core.model.utils.GlobBuilder;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class XmlGlobWriterTest {
     private GlobRepository globRepository;
@@ -50,8 +49,8 @@ public class XmlGlobWriterTest {
     }
 
 
-    @Ignore // TODO containment not defined correctly
-    @Test
+//    @Ignore // TODO containment not defined correctly
+//    @Test
     public void testLinkField() throws Exception {
         globRepository =
                 GlobRepositoryBuilder
@@ -112,8 +111,8 @@ public class XmlGlobWriterTest {
                         "<dummyObjectWithLinks id='2' siblingId='1'/>");
     }
 
-    @Test
-    @Ignore
+//    @Test
+//    @Ignore
     public void testContainmentLink() throws Exception {
         globRepository =
                 GlobRepositoryBuilder

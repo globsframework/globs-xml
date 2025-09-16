@@ -5,7 +5,7 @@ import org.globsframework.core.model.MutableGlob;
 import org.globsframework.xml.XmlTestUtils;
 import org.globsframework.xml.custom.XmlGlobBuilder;
 import org.globsframework.xml.custom.XmlGlobReader;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.io.StringReader;

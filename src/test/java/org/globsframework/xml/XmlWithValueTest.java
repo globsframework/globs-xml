@@ -5,9 +5,7 @@ import org.globsframework.xml.custom.XmlGlobBuilder;
 import org.globsframework.xml.custom.XmlGlobReader;
 import org.globsframework.xml.structured.DataWithMixValue;
 import org.globsframework.xml.structured.RootWithValue;
-import org.junit.Assert;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.io.StringReader;
@@ -15,10 +13,12 @@ import java.io.StringWriter;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 public class XmlWithValueTest {
 
-    @Test
-    @Ignore
+//    @Test
+//    @Ignore
     public void withValue() throws IOException {
         Glob actual = XmlGlobReader.read(kind -> RootWithValue.TYPE, new StringReader(
                 "<root>" +
@@ -27,15 +27,15 @@ public class XmlWithValueTest {
                         "</root>"
         ));
 
-        Assert.assertEquals("attrValue", actual.get(RootWithValue.dataWithValue).get(DataWithMixValue.valueAsAttr));
-        Assert.assertEquals(3.14, actual.get(RootWithValue.dataWithValue).get(DataWithMixValue.valueAsAttrDouble), 0.001);
-        Assert.assertEquals(ZonedDateTime.parse("2011-12-03T10:15:30+01:00[Europe/Paris]"), actual.get(RootWithValue.dataWithValue).get(DataWithMixValue.valueAsAttrDateTime));
-        Assert.assertEquals(ZonedDateTime.parse("+10000-01-01T00:59:59+01:00[Europe/Paris]"), actual.get(RootWithValue.dataWithValue).get(DataWithMixValue.correctDate));
-        Assert.assertEquals("value", actual.get(RootWithValue.dataWithValue).get(DataWithMixValue.valueAsValue));
+        assertEquals("attrValue", actual.get(RootWithValue.dataWithValue).get(DataWithMixValue.valueAsAttr));
+        assertEquals(3.14, actual.get(RootWithValue.dataWithValue).get(DataWithMixValue.valueAsAttrDouble), 0.001);
+        assertEquals(ZonedDateTime.parse("2011-12-03T10:15:30+01:00[Europe/Paris]"), actual.get(RootWithValue.dataWithValue).get(DataWithMixValue.valueAsAttrDateTime));
+        assertEquals(ZonedDateTime.parse("+10000-01-01T00:59:59+01:00[Europe/Paris]"), actual.get(RootWithValue.dataWithValue).get(DataWithMixValue.correctDate));
+        assertEquals("value", actual.get(RootWithValue.dataWithValue).get(DataWithMixValue.valueAsValue));
         StringWriter writer = new StringWriter();
         XmlGlobBuilder.write(actual, writer);
         String date = DateTimeFormatter.ISO_DATE_TIME.format(actual.get(RootWithValue.dataWithValue).get(DataWithMixValue.correctDate));
-        Assert.assertEquals("<rootWithValue><dataWithValue valueAsAttr=\"attrValue\" valueAsAttrDouble=\"3.14\" valueAsAttrDateTime=\"2011-12-03T10:15:30\"" +
+        assertEquals("<rootWithValue><dataWithValue valueAsAttr=\"attrValue\" valueAsAttrDouble=\"3.14\" valueAsAttrDateTime=\"2011-12-03T10:15:30\"" +
                 " correctDate=\"" + date + "\">value</dataWithValue></rootWithValue>", writer.toString());
     }
 
@@ -51,12 +51,12 @@ public class XmlWithValueTest {
                         "</root>"
         ));
 
-        Assert.assertEquals(2, actual.get(RootWithValue.dataWithValue).get(DataWithMixValue.array).length);
-        Assert.assertEquals("AAA", actual.get(RootWithValue.dataWithValue).get(DataWithMixValue.array)[0]);
-        Assert.assertEquals("BBB", actual.get(RootWithValue.dataWithValue).get(DataWithMixValue.array)[1]);
+        assertEquals(2, actual.get(RootWithValue.dataWithValue).get(DataWithMixValue.array).length);
+        assertEquals("AAA", actual.get(RootWithValue.dataWithValue).get(DataWithMixValue.array)[0]);
+        assertEquals("BBB", actual.get(RootWithValue.dataWithValue).get(DataWithMixValue.array)[1]);
         StringWriter writer = new StringWriter();
         XmlGlobBuilder.write(actual, writer);
-        Assert.assertEquals("<rootWithValue><dataWithValue><array>AAA</array><array>BBB</array></dataWithValue></rootWithValue>", writer.toString());
+        assertEquals("<rootWithValue><dataWithValue><array>AAA</array><array>BBB</array></dataWithValue></rootWithValue>", writer.toString());
     }
 
 }

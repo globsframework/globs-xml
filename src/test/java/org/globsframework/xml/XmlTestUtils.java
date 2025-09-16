@@ -3,7 +3,7 @@ package org.globsframework.xml;
 import org.apache.xerces.parsers.SAXParser;
 import org.globsframework.saxstack.comparator.XmlComparator;
 import org.globsframework.saxstack.utils.XmlUtils;
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 
 import java.io.IOException;
 
@@ -45,7 +45,7 @@ public class XmlTestUtils {
     }
 
     private static void showStringDiff(String expected, String actual, SAXParser parser) throws IOException {
-        Assert.assertEquals(XmlUtils.format(expected, parser, 4),
+        Assertions.assertEquals(XmlUtils.format(expected, parser, 4),
                 XmlUtils.format(actual, parser, 4));
     }
 }
