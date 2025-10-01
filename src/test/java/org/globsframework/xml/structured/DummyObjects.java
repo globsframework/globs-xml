@@ -3,10 +3,7 @@ package org.globsframework.xml.structured;
 import org.globsframework.core.metamodel.GlobType;
 import org.globsframework.core.metamodel.GlobTypeLoaderFactory;
 import org.globsframework.core.metamodel.annotations.Target;
-import org.globsframework.core.metamodel.fields.GlobArrayField;
-import org.globsframework.core.metamodel.fields.GlobField;
-import org.globsframework.core.metamodel.fields.IntegerField;
-import org.globsframework.core.metamodel.fields.StringField;
+import org.globsframework.core.metamodel.fields.*;
 import org.globsframework.xml.custom.XmlNode_;
 
 public class DummyObjects {
@@ -37,6 +34,8 @@ public class DummyObjects {
 
     public static class SubDummy {
         public static GlobType TYPE;
+
+        public static LongField longValue;
 
         @XmlNode_
         public static StringField SUB_NAME;

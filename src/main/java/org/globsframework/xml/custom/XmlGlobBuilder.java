@@ -9,6 +9,7 @@ import org.globsframework.xml.XmlGlobWriter;
 
 import java.io.IOException;
 import java.io.Writer;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -18,16 +19,29 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class XmlGlobBuilder {
-    private final Map<String, String> nsMapping = new HashMap<>();
+    private final boolean defaultToXmlNode;
+    private Map<String, String> nsMapping = Map.of();
 
     public static void write(Glob data, Writer writer) throws IOException {
-        new XmlGlobBuilder().writeWithNS(data, writer);
+        write(data, writer, false);
+    }
+
+    public static void write(Glob data, Writer writer, boolean defaultToXmlNode) throws IOException {
+        new XmlGlobBuilder(defaultToXmlNode).writeWithNS(data, writer);
     }
 
     public XmlGlobBuilder() {
+        this.defaultToXmlNode = false;
+    }
+
+    public XmlGlobBuilder(boolean defaultToXmlNode) {
+        this.defaultToXmlNode = defaultToXmlNode;
     }
 
     public XmlGlobBuilder withNS(String name, String url) {
+        if (nsMapping == Map.<String, String>of()) {
+            nsMapping = new HashMap<>();
+        }
         nsMapping.put(url, name);
         return this;
     }
@@ -37,7 +51,7 @@ public class XmlGlobBuilder {
         XmlNamespace xmlNamespace = XmlNamespace.create(type, nsMapping);
         XmlTag xmlTag = XmlWriter.startTag(writer, xmlNamespace.addToTag(XmlGlobWriter.getXmlName(type)));
         xmlNamespace.addAttr(xmlTag);
-        data.safeAccept(new XmlFieldValueVisitor(xmlTag, xmlNamespace));
+        data.safeAccept(new XmlFieldValueVisitor(xmlTag, xmlNamespace, defaultToXmlNode));
         xmlTag.end();
     }
 
@@ -93,10 +107,12 @@ public class XmlGlobBuilder {
 
     private static class XmlFieldValueVisitor extends FieldValueVisitor.AbstractWithErrorVisitor {
         private XmlTag xmlTag;
+        private final boolean defaultToXmlNode;
         private Deque<XmlNamespace> ns = new ArrayDeque<>();
 
-        public XmlFieldValueVisitor(XmlTag xmlTag, XmlNamespace xmlNamespace) {
+        public XmlFieldValueVisitor(XmlTag xmlTag, XmlNamespace xmlNamespace, boolean defaultToXmlNode) {
             this.xmlTag = xmlTag;
+            this.defaultToXmlNode = defaultToXmlNode;
             ns.push(xmlNamespace);
         }
 
@@ -105,8 +121,11 @@ public class XmlGlobBuilder {
         }
 
         private void dumpSimpleValue(Field field, String strValue) throws IOException {
-            if (field.hasAnnotation(XmlAsNode.UNIQUE_KEY)) {
-                if (strValue != null || field.getAnnotation(XmlAsNode.UNIQUE_KEY).isTrue(XmlAsNode.MANDATORY)) {
+            if (field.hasAnnotation(XmlValue.UNIQUE_KEY)) {
+                xmlTag.addValue(strValue);
+            } else if (defaultToXmlNode || field.hasAnnotation(XmlAsNode.UNIQUE_KEY)) {
+                final Glob annotation = field.findAnnotation(XmlAsNode.UNIQUE_KEY);
+                if (strValue != null || (annotation != null && annotation.isTrue(XmlAsNode.MANDATORY))) {
                     xmlTag = xmlTag.createChildTag(ns.element().addToTag(XmlGlobWriter.getXmlName(field)));
                     if (strValue != null) {
                         if (field.hasAnnotation(XmlValueAsCData.UNIQUE_KEY)) {
@@ -117,13 +136,19 @@ public class XmlGlobBuilder {
                     }
                     xmlTag = xmlTag.end();
                 }
-            } else if (field.hasAnnotation(XmlValue.UNIQUE_KEY)) {
-                xmlTag.addValue(strValue);
             } else {
                 if (strValue != null) {
                     xmlTag.addAttribute(ns.element().addToTag(XmlGlobWriter.getXmlName(field)), strValue);
                 }
             }
+        }
+
+        public void visitBigDecimal(BigDecimalField field, BigDecimal value) throws Exception {
+            dumpSimpleValue(field, value != null ? value.toString() : null);
+        }
+
+        public void visitLong(LongField field, Long value) throws Exception {
+            dumpSimpleValue(field, value != null ? Long.toString(value) : null);
         }
 
         public void visitDouble(DoubleField field, Double value) throws Exception {

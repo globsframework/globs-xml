@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 import org.xml.sax.Attributes;
 
 import java.io.Reader;
+import java.math.BigDecimal;
 import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAccessor;
@@ -22,7 +23,11 @@ public class XmlGlobReader {
     private static final Logger LOGGER = LoggerFactory.getLogger(XmlGlobReader.class);
 
     public static Glob read(GlobTypeAccessor globTypeAccessor, Reader reader) {
-        GlobTypeXmlNodeModelService globTypeXmlNodeModelService = new GlobTypeXmlNodeModelService();
+        return read(globTypeAccessor, reader, false);
+    }
+
+    public static Glob read(GlobTypeAccessor globTypeAccessor, Reader reader, boolean defaultToXmlNode) {
+        GlobTypeXmlNodeModelService globTypeXmlNodeModelService = new GlobTypeXmlNodeModelService(defaultToXmlNode);
         RootGlobXmlNode rootNode = new RootGlobXmlNode(globTypeAccessor, globTypeXmlNodeModelService);
         SaxStackParser.parse(XmlUtils.getXmlReader(), rootNode, reader);
         return rootNode.mutableGlob;
@@ -100,6 +105,38 @@ public class XmlGlobReader {
         }
     }
 
+    static class LongManageFieldNode implements ManageFieldNode {
+        LongField field;
+
+        public LongManageFieldNode(LongField field) {
+            this.field = field;
+        }
+
+        public XmlNode fillFromSubNode(MutableGlob mutableGlob, String childName, Attributes xmlAttrs) {
+            return new DefaultXmlNode() {
+                public void setValue(String value) {
+                    mutableGlob.set(field, Long.parseLong(value));
+                }
+            };
+        }
+    }
+
+    static class BigDecimalManageFieldNode implements ManageFieldNode {
+        BigDecimalField field;
+
+        public BigDecimalManageFieldNode(BigDecimalField field) {
+            this.field = field;
+        }
+
+        public XmlNode fillFromSubNode(MutableGlob mutableGlob, String childName, Attributes xmlAttrs) {
+            return new DefaultXmlNode() {
+                public void setValue(String value) {
+                    mutableGlob.set(field, new BigDecimal(value));
+                }
+            };
+        }
+    }
+
     static class BooleanManageFieldNode implements ManageFieldNode {
         BooleanField field;
 
@@ -170,7 +207,12 @@ public class XmlGlobReader {
     }
 
     static class GlobTypeXmlNodeModelService {
+        private final boolean defaultToXmlNode;
         Map<GlobType, GlobTypXmlNodeModel> xmlNodeModel = new HashMap<>();
+
+        public GlobTypeXmlNodeModelService(boolean defaultToXmlNode) {
+            this.defaultToXmlNode = defaultToXmlNode;
+        }
 
         public GlobTypXmlNodeModel get(GlobType globType) {
             GlobTypXmlNodeModel globTypXmlNodeModel = xmlNodeModel.get(globType);
@@ -222,6 +264,32 @@ public class XmlGlobReader {
 
         void update(MutableGlob mutableGlob, String value) {
             mutableGlob.set(field, Integer.parseInt(value));
+        }
+    }
+
+    static class BigDecimalManageFieldAttr extends AbstractManageFieldAttr {
+        final BigDecimalField field;
+
+        BigDecimalManageFieldAttr(BigDecimalField field, String xmlName) {
+            super(xmlName);
+            this.field = field;
+        }
+
+        void update(MutableGlob mutableGlob, String value) {
+            mutableGlob.set(field, new BigDecimal(value));
+        }
+    }
+
+    static class LongManageFieldAttr extends AbstractManageFieldAttr {
+        final LongField field;
+
+        LongManageFieldAttr(LongField field, String xmlName) {
+            super(xmlName);
+            this.field = field;
+        }
+
+        void update(MutableGlob mutableGlob, String value) {
+            mutableGlob.set(field, Long.parseLong(value));
         }
     }
 
@@ -374,7 +442,7 @@ public class XmlGlobReader {
             this.globType = globType;
             for (Field field : globType.getFields()) {
                 String xmlName = XmlGlobWriter.getXmlName(field);
-                if (field.hasAnnotation(XmlAsNode.UNIQUE_KEY) || !field.getDataType().isPrimive()) {
+                if (nodeModelService.defaultToXmlNode || field.hasAnnotation(XmlAsNode.UNIQUE_KEY) || !field.getDataType().isPrimive()) {
                     fieldAsNode.put(xmlName, field.safeAccept(new FieldModelVisitor(this.nodeModelService)).manageFieldNode);
                 } else if (field.hasAnnotation(XmlValue.UNIQUE_KEY)) {
                     valueUpdated = field.safeAccept(new ConvertFieldAsAttrVisitor()).updateFromStr;
@@ -412,6 +480,16 @@ public class XmlGlobReader {
 
             private FieldModelVisitor(GlobTypeXmlNodeModelService nodeModelService) {
                 this.nodeModelService = nodeModelService;
+            }
+
+            @Override
+            public void visitBigDecimal(BigDecimalField field) throws Exception {
+                manageFieldNode = new BigDecimalManageFieldNode(field);
+            }
+
+            @Override
+            public void visitLong(LongField field) throws Exception {
+                manageFieldNode = new LongManageFieldNode(field);
             }
 
             public void visitBoolean(BooleanField field) throws Exception {
@@ -472,6 +550,14 @@ public class XmlGlobReader {
 
             public ManagedFieldAsAttrVisitor(String xmlName) {
                 this.xmlName = xmlName;
+            }
+
+            public void visitBigDecimal(BigDecimalField field) throws Exception {
+                manageFieldAttr = new BigDecimalManageFieldAttr(field, xmlName);
+            }
+
+            public void visitLong(LongField field) throws Exception {
+                manageFieldAttr = new LongManageFieldAttr(field, xmlName);
             }
 
             public void visitString(StringField field) throws Exception {
