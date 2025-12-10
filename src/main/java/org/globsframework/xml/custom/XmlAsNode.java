@@ -4,9 +4,9 @@ import org.globsframework.core.metamodel.GlobType;
 import org.globsframework.core.metamodel.GlobTypeBuilder;
 import org.globsframework.core.metamodel.GlobTypeBuilderFactory;
 import org.globsframework.core.metamodel.annotations.GlobCreateFromAnnotation;
-import org.globsframework.core.metamodel.annotations.InitUniqueKey;
 import org.globsframework.core.metamodel.fields.BooleanField;
 import org.globsframework.core.metamodel.fields.StringField;
+import org.globsframework.core.model.Glob;
 import org.globsframework.core.model.Key;
 import org.globsframework.core.model.KeyBuilder;
 import org.globsframework.core.model.MutableGlob;
@@ -19,8 +19,22 @@ public class XmlAsNode {
 
     public static final BooleanField MANDATORY;
 
-    @InitUniqueKey
     public static final Key UNIQUE_KEY;
+
+    public static final Glob UNIQUE_INSTANCE;
+
+    public static Glob create(String name, boolean mandatory) {
+        MutableGlob glob = TYPE.instantiate();
+        glob.set(NAME, name);
+        glob.set(MANDATORY, mandatory);
+        return glob;
+    }
+
+    public static Glob create(String name) {
+        MutableGlob glob = TYPE.instantiate();
+        glob.set(NAME, name);
+        return glob;
+    }
 
     static {
         GlobTypeBuilder typeBuilder = GlobTypeBuilderFactory.create("XmlAsNode");
@@ -30,10 +44,7 @@ public class XmlAsNode {
         typeBuilder.complete();
         typeBuilder.register(GlobCreateFromAnnotation.class, annotation -> create((XmlNode_) annotation));
         UNIQUE_KEY = KeyBuilder.newEmptyKey(TYPE);
-
-//        GlobTypeLoaderFactory.create(XmlAsNode.class, "_XmlAsNode")
-//                .register(GlobCreateFromAnnotation.class, annotation -> create((XmlNode_) annotation))
-//                .load();
+        UNIQUE_INSTANCE = TYPE.instantiate();
     }
 
     private static MutableGlob create(XmlNode_ annotation) {

@@ -6,13 +6,18 @@ import org.globsframework.core.model.Glob;
 import org.globsframework.core.model.MutableGlob;
 import org.globsframework.core.utils.Strings;
 import org.globsframework.saxstack.parser.*;
+import org.globsframework.saxstack.utils.XmlNodeToBuilder;
 import org.globsframework.saxstack.utils.XmlUtils;
+import org.globsframework.saxstack.writer.RootXmlTag;
+import org.globsframework.saxstack.writer.XmlWriter;
 import org.globsframework.xml.XmlGlobWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.Attributes;
 
+import java.io.IOException;
 import java.io.Reader;
+import java.io.StringWriter;
 import java.math.BigDecimal;
 import java.time.*;
 import java.time.format.DateTimeFormatter;
@@ -171,7 +176,7 @@ public class XmlGlobReader {
 
     static class GlobManageFieldNode implements ManageFieldNode {
         private final GlobTypeXmlNodeModelService nodeModelService;
-        GlobField field;
+        private final GlobField field;
 
         public GlobManageFieldNode(GlobField field, GlobTypeXmlNodeModelService nodeModelService) {
             this.nodeModelService = nodeModelService;
@@ -442,7 +447,10 @@ public class XmlGlobReader {
             this.globType = globType;
             for (Field field : globType.getFields()) {
                 String xmlName = XmlGlobWriter.getXmlName(field);
-                if (nodeModelService.defaultToXmlNode || field.hasAnnotation(XmlAsNode.UNIQUE_KEY) || !field.getDataType().isPrimive()) {
+                if (nodeModelService.defaultToXmlNode ||
+                    field.hasAnnotation(XmlAsNode.UNIQUE_KEY) ||
+                    field.hasAnnotation(ValueIsXml.UNIQUE_KEY) ||
+                    !field.getDataType().isPrimive()) {
                     fieldAsNode.put(xmlName, field.safeAccept(new FieldModelVisitor(this.nodeModelService)).manageFieldNode);
                 } else if (field.hasAnnotation(XmlValue.UNIQUE_KEY)) {
                     valueUpdated = field.safeAccept(new ConvertFieldAsAttrVisitor()).updateFromStr;
@@ -497,7 +505,11 @@ public class XmlGlobReader {
             }
 
             public void visitString(StringField field) throws Exception {
-                manageFieldNode = new StringManageFieldNode(field);
+                if (field.hasAnnotation(ValueIsXml.UNIQUE_KEY)) {
+                  manageFieldNode = new ValueAsXmlManageFieldNode(field);
+                } else {
+                    manageFieldNode = new StringManageFieldNode(field);
+                }
             }
 
             public void visitStringArray(StringArrayField field) throws Exception {
@@ -540,6 +552,30 @@ public class XmlGlobReader {
                             dateConverter.update(mutableGlob, value);
                         }
                     };
+                }
+            }
+
+            private static class ValueAsXmlManageFieldNode implements ManageFieldNode {
+                private final StringField field;
+
+                public ValueAsXmlManageFieldNode(StringField field) {
+                    this.field = field;
+                }
+
+                @Override
+                public XmlNode fillFromSubNode(MutableGlob mutableGlob, String childName, Attributes xmlAttrs) {
+                    StringWriter stringWriter = new StringWriter();
+                    try {
+                        final RootXmlTag xmlTag = new RootXmlTag(stringWriter);
+                        return new XmlNodeToBuilder(xmlTag, xmlAttrs) {
+                            @Override
+                            public void complete() {
+                                mutableGlob.set(field, stringWriter.toString());
+                            }
+                        };
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
                 }
             }
         }

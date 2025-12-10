@@ -156,7 +156,14 @@ public class XmlGlobBuilder {
         }
 
         public void visitString(StringField field, String value) throws Exception {
-            dumpSimpleValue(field, value);
+            if (field.hasAnnotation(ValueIsXml.UNIQUE_KEY)) {
+                xmlTag = xmlTag.createChildTag(ns.element().addToTag(XmlGlobWriter.getXmlName(field)));
+                xmlTag.addXmlSubtree(value);
+                xmlTag = xmlTag.end();
+            }
+            else {
+                dumpSimpleValue(field, value);
+            }
         }
 
         public void visitBoolean(BooleanField field, Boolean value) throws Exception {
