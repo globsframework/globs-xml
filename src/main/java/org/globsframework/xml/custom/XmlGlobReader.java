@@ -446,10 +446,14 @@ public class XmlGlobReader {
             this.nodeModelService = nodeModelService;
             this.globType = globType;
             for (Field field : globType.getFields()) {
-                String xmlName = XmlGlobWriter.getXmlName(field);
+                String tmp = XmlGlobWriter.getXmlName(field);
+                final Glob xmlAsNode = field.findAnnotation(XmlAsNode.UNIQUE_KEY);
+                String xmlName = xmlAsNode != null ? xmlAsNode.getOrDefault(XmlAsNode.NAME, tmp) : tmp;
+                final Glob valueIsXml = field.findAnnotation(ValueIsXml.UNIQUE_KEY);
+                xmlName = valueIsXml != null ? valueIsXml.getOrDefault(ValueIsXml.NAME, xmlName) : xmlName;
                 if (nodeModelService.defaultToXmlNode ||
-                    field.hasAnnotation(XmlAsNode.UNIQUE_KEY) ||
-                    field.hasAnnotation(ValueIsXml.UNIQUE_KEY) ||
+                    xmlAsNode != null ||
+                    valueIsXml != null ||
                     !field.getDataType().isPrimive()) {
                     fieldAsNode.put(xmlName, field.safeAccept(new FieldModelVisitor(this.nodeModelService)).manageFieldNode);
                 } else if (field.hasAnnotation(XmlValue.UNIQUE_KEY)) {
@@ -506,7 +510,7 @@ public class XmlGlobReader {
 
             public void visitString(StringField field) throws Exception {
                 if (field.hasAnnotation(ValueIsXml.UNIQUE_KEY)) {
-                  manageFieldNode = new ValueAsXmlManageFieldNode(field);
+                    manageFieldNode = new ValueAsXmlManageFieldNode(field);
                 } else {
                     manageFieldNode = new StringManageFieldNode(field);
                 }

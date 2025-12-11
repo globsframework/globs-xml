@@ -14,7 +14,7 @@ public class DummyObjects {
         @XmlNode_
         public static StringField NAME;
 
-        @XmlNode_
+        @XmlNode_(name = "SIMPLE")
         @Target(SubDummy.class)
         public static GlobField SIMPLE_SUB;
 

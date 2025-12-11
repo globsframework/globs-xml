@@ -17,7 +17,7 @@ public class StringIsXmlTest {
         final StringWriter writer = new StringWriter();
         final String xml = "<hello><a>data</a></hello>";
         XmlGlobBuilder.write(DataWithInnerXml.create("toto", xml), writer);
-        Assertions.assertEquals("<DataWithInnerXml name=\"toto\"><subXml><hello><a>data</a></hello></subXml></DataWithInnerXml>", writer.toString());
+        Assertions.assertEquals("<DataWithInnerXml name=\"toto\"><SUB_XML><hello><a>data</a></hello></SUB_XML></DataWithInnerXml>", writer.toString());
         final Glob read = XmlGlobReader.read(kind -> DataWithInnerXml.TYPE, new StringReader(writer.toString()));
         Assertions.assertNotNull(read);
         Assertions.assertEquals(xml, read.get(DataWithInnerXml.subXml));

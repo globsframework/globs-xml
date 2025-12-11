@@ -11,7 +11,7 @@ public class DataWithInnerXml {
 
     public static StringField name;
 
-    @ValueIsXml_
+    @ValueIsXml_("SUB_XML")
     public static StringField subXml;
 
     static {

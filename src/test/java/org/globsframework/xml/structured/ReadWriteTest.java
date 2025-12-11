@@ -27,10 +27,10 @@ public class ReadWriteTest {
         XmlGlobBuilder.write(data, stringWriter);
         XmlTestUtils.assertEquivalent("<dummyObject>\n" +
                 "    <name>dummy 1</name>\n" +
-                "    <simpleSub longValue=\"2\">\n" +
+                "    <SIMPLE longValue=\"2\">\n" +
                 "        <subName>sub1</subName>\n" +
                 "        <count>2</count>\n" +
-                "    </simpleSub>\n" +
+                "    </SIMPLE>\n" +
                 "    <simpleSubArray longValue=\"3\">\n" +
                 "        <subName>\n" +
                 "            sub2\n" +
@@ -65,11 +65,11 @@ public class ReadWriteTest {
         XmlGlobBuilder.write(data, stringWriter, true);
         XmlTestUtils.assertEquivalent("<dummyObject>\n" +
                                       "    <name>dummy 1</name>\n" +
-                                      "    <simpleSub >\n" +
+                                      "    <SIMPLE>\n" +
                                       "        <longValue>2</longValue>\n" +
                                       "        <subName>sub1</subName>\n" +
                                       "        <count>2</count>\n" +
-                                      "    </simpleSub>\n" +
+                                      "    </SIMPLE>\n" +
                                       "    <simpleSubArray>\n" +
                                       "        <longValue>3</longValue>\n" +
                                       "        <subName>\n" +

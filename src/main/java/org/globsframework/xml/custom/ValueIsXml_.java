@@ -13,6 +13,8 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 public @interface ValueIsXml_ {
 
+    String value() default "";
+
     GlobType TYPE = ValueIsXml.TYPE;
 
 }

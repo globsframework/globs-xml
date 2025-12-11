@@ -123,22 +123,25 @@ public class XmlGlobBuilder {
         private void dumpSimpleValue(Field field, String strValue) throws IOException {
             if (field.hasAnnotation(XmlValue.UNIQUE_KEY)) {
                 xmlTag.addValue(strValue);
-            } else if (defaultToXmlNode || field.hasAnnotation(XmlAsNode.UNIQUE_KEY)) {
-                final Glob annotation = field.findAnnotation(XmlAsNode.UNIQUE_KEY);
-                if (strValue != null || (annotation != null && annotation.isTrue(XmlAsNode.MANDATORY))) {
-                    xmlTag = xmlTag.createChildTag(ns.element().addToTag(XmlGlobWriter.getXmlName(field)));
-                    if (strValue != null) {
-                        if (field.hasAnnotation(XmlValueAsCData.UNIQUE_KEY)) {
-                            xmlTag.addCDataValue(strValue);
-                        } else {
-                            xmlTag.addValue(strValue);
-                        }
-                    }
-                    xmlTag = xmlTag.end();
-                }
             } else {
-                if (strValue != null) {
-                    xmlTag.addAttribute(ns.element().addToTag(XmlGlobWriter.getXmlName(field)), strValue);
+                final String xmlName = XmlGlobWriter.getXmlName(field);
+                final Glob xmlAsNode = field.findAnnotation(XmlAsNode.UNIQUE_KEY);
+                if (defaultToXmlNode || xmlAsNode != null) {
+                    if (strValue != null || (xmlAsNode != null && xmlAsNode.isTrue(XmlAsNode.MANDATORY))) {
+                        xmlTag = xmlTag.createChildTag(ns.element().addToTag(xmlAsNode != null ? xmlAsNode.getOrDefault(XmlAsNode.NAME, xmlName) : xmlName));
+                        if (strValue != null) {
+                            if (field.hasAnnotation(XmlValueAsCData.UNIQUE_KEY)) {
+                                xmlTag.addCDataValue(strValue);
+                            } else {
+                                xmlTag.addValue(strValue);
+                            }
+                        }
+                        xmlTag = xmlTag.end();
+                    }
+                } else {
+                    if (strValue != null) {
+                        xmlTag.addAttribute(ns.element().addToTag(xmlName), strValue);
+                    }
                 }
             }
         }
@@ -156,8 +159,10 @@ public class XmlGlobBuilder {
         }
 
         public void visitString(StringField field, String value) throws Exception {
-            if (field.hasAnnotation(ValueIsXml.UNIQUE_KEY)) {
-                xmlTag = xmlTag.createChildTag(ns.element().addToTag(XmlGlobWriter.getXmlName(field)));
+            final Glob valueIsXml = field.findAnnotation(ValueIsXml.UNIQUE_KEY);
+            if (valueIsXml != null) {
+                String tmp = XmlGlobWriter.getXmlName(field);
+                xmlTag = xmlTag.createChildTag(ns.element().addToTag(valueIsXml.getOrDefault(ValueIsXml.NAME, tmp)));
                 xmlTag.addXmlSubtree(value);
                 xmlTag = xmlTag.end();
             }
@@ -206,7 +211,10 @@ public class XmlGlobBuilder {
                 if (!useParent) {
                     ns.push(ns.element().sub(targetType));
                 }
-                xmlTag = xmlTag.createChildTag(ns.element().addToTag(XmlGlobWriter.getXmlName(field)));
+                final Glob xmlAsNode = field.findAnnotation(XmlAsNode.UNIQUE_KEY);
+                String tmp = XmlGlobWriter.getXmlName(field);
+                String xmlName = xmlAsNode != null ? xmlAsNode.getOrDefault(XmlAsNode.NAME, tmp) : tmp;
+                xmlTag = xmlTag.createChildTag(ns.element().addToTag(xmlName));
                 if (useParent) {
                     ns.push(ns.element().sub(targetType));
                 }
