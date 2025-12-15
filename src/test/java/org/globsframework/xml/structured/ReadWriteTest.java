@@ -21,33 +21,46 @@ public class ReadWriteTest {
     public void writer() throws IOException {
         MutableGlob data = DummyObject.TYPE.instantiate().set(DummyObject.NAME, "dummy 1")
                 .set(DummyObject.SIMPLE_SUB, create("sub1", 2))
-                .set(DummyObject.SIMPLE_SUB_ARRAY, new Glob[]{create("sub2", 3), create("sub 4", 4)});
+                .set(DummyObject.SIMPLE_SUB_ARRAY, new Glob[]{create("sub2", 3), create("sub 4", 4)})
+                .set(DummyObject.SIMPLE_SUB_UNION, create("sub 5", 5))
+                ;
 
         StringWriter stringWriter = new StringWriter();
         XmlGlobBuilder.write(data, stringWriter);
-        XmlTestUtils.assertEquivalent("<dummyObject>\n" +
-                "    <name>dummy 1</name>\n" +
-                "    <SIMPLE longValue=\"2\">\n" +
-                "        <subName>sub1</subName>\n" +
-                "        <count>2</count>\n" +
-                "    </SIMPLE>\n" +
-                "    <simpleSubArray longValue=\"3\">\n" +
-                "        <subName>\n" +
-                "            sub2\n" +
-                "        </subName>\n" +
-                "        <count>\n" +
-                "            3\n" +
-                "        </count>\n" +
-                "    </simpleSubArray>\n" +
-                "    <simpleSubArray longValue=\"4\">\n" +
-                "        <subName>\n" +
-                "            sub 4\n" +
-                "        </subName>\n" +
-                "        <count>\n" +
-                "            4\n" +
-                "        </count>\n" +
-                "    </simpleSubArray>\n" +
-                "</dummyObject>", stringWriter.toString());
+        XmlTestUtils.assertEquivalent("""
+                        <dummyObject>
+                            <name>dummy 1</name>
+                            <SIMPLE longValue="2">
+                                <subName>sub1</subName>
+                                <count>2</count>
+                            </SIMPLE>
+                            <simpleSubArray longValue="3">
+                                <subName>
+                                    sub2
+                                </subName>
+                                <count>
+                                    3
+                                </count>
+                            </simpleSubArray>
+                            <simpleSubArray longValue="4">
+                                <subName>
+                                    sub 4
+                                </subName>
+                                <count>
+                                    4
+                                </count>
+                            </simpleSubArray>
+                            <simpleSubUnion __type__="subDummy" longValue="5">
+                              <subName>
+                                sub 5
+                              </subName>
+                              <count>
+                                5
+                              </count>
+                            </simpleSubUnion>
+                        </dummyObject>
+                        """
+                , stringWriter.toString());
 
         Glob glob = XmlGlobReader.read(kind -> DummyObject.TYPE, new StringReader(stringWriter.toString()));
         StringWriter newStr = new StringWriter();

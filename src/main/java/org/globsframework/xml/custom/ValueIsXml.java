@@ -4,8 +4,6 @@ import org.globsframework.core.metamodel.GlobType;
 import org.globsframework.core.metamodel.GlobTypeBuilder;
 import org.globsframework.core.metamodel.GlobTypeBuilderFactory;
 import org.globsframework.core.metamodel.annotations.GlobCreateFromAnnotation;
-import org.globsframework.core.metamodel.annotations.InitUniqueGlob;
-import org.globsframework.core.metamodel.annotations.InitUniqueKey;
 import org.globsframework.core.metamodel.fields.StringField;
 import org.globsframework.core.model.Glob;
 import org.globsframework.core.model.Key;
@@ -18,8 +16,18 @@ public class ValueIsXml {
 
     public static final StringField NAME;
 
-    @InitUniqueKey
+    public static final Glob DEFAULT;
+
     public static final Key UNIQUE_KEY;
+
+    public static Glob create(){
+        return DEFAULT;
+    }
+
+    public static Glob create(String name) {
+        return TYPE.instantiate()
+                .set(NAME, name);
+    }
 
     static {
         GlobTypeBuilder typeBuilder = GlobTypeBuilderFactory.create("ValueIsXml");
@@ -34,6 +42,7 @@ public class ValueIsXml {
             }
             return instantiate;
         });
+        DEFAULT = TYPE.instantiate();
 //        GlobTypeLoaderFactory.create(XmlValue.class, "_XmlValue")
 //                .register(GlobCreateFromAnnotation.class, annotation -> UNIQUE_GLOB)
 //                .load();

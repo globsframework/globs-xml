@@ -31,9 +31,11 @@ public class XmlAsNode {
     }
 
     public static Glob create(String name) {
-        MutableGlob glob = TYPE.instantiate();
-        glob.set(NAME, name);
-        return glob;
+        return TYPE.instantiate().set(NAME, name);
+    }
+
+    public static Glob create() {
+        return UNIQUE_INSTANCE;
     }
 
     static {

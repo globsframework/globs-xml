@@ -225,6 +225,56 @@ public class XmlGlobBuilder {
             }
         }
 
+        @Override
+        public void visitUnionGlob(GlobUnionField field, Glob value) throws Exception {
+            if (value != null) {
+                GlobType targetType = value.getType();
+                final boolean useParent = field.findOptAnnotation(XmlUseParentNS.UNIQUE_KEY)
+                        .map(XmlUseParentNS.useParent).orElse(false);
+                if (!useParent) {
+                    ns.push(ns.element().sub(targetType));
+                }
+                final Glob xmlAsNode = field.findAnnotation(XmlAsNode.UNIQUE_KEY);
+                String tmp = XmlGlobWriter.getXmlName(field);
+                String xmlName = xmlAsNode != null ? xmlAsNode.getOrDefault(XmlAsNode.NAME, tmp) : tmp;
+                xmlTag = xmlTag.createChildTag(ns.element().addToTag(xmlName));
+                xmlTag.addAttribute("__type__", targetType.getName());
+                if (useParent) {
+                    ns.push(ns.element().sub(targetType));
+                }
+                ns.element().addAttr(xmlTag);
+                value.safeAccept(this);
+                xmlTag = xmlTag.end();
+                ns.pop();
+            }
+        }
+
+        @Override
+        public void visitUnionGlobArray(GlobArrayUnionField field, Glob[] value) throws Exception {
+            if (value != null && value.length != 0) {
+                for (Glob glob : value) {
+                    if (glob == null) {
+                        continue;
+                    }
+                    GlobType targetType = glob.getType();
+                    final boolean useParent = field.findOptAnnotation(XmlUseParentNS.UNIQUE_KEY)
+                            .map(XmlUseParentNS.useParent).orElse(false);
+                    if (!useParent) {
+                        ns.push(ns.element().sub(targetType));
+                    }
+                    xmlTag = xmlTag.createChildTag(ns.element().addToTag(XmlGlobWriter.getXmlName(field)));
+                    xmlTag.addAttribute("__type__", targetType.getName());
+                    if (useParent) {
+                        ns.push(ns.element().sub(targetType));
+                    }
+                    ns.element().addAttr(xmlTag);
+                    glob.safeAccept(this);
+                    xmlTag = xmlTag.end();
+                    ns.pop();
+                }
+            }
+        }
+
         public void visitGlobArray(GlobArrayField field, Glob[] value) throws Exception {
             if (value != null && value.length != 0) {
                 GlobType targetType = field.getTargetType();

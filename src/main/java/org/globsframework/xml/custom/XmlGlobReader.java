@@ -9,7 +9,6 @@ import org.globsframework.saxstack.parser.*;
 import org.globsframework.saxstack.utils.XmlNodeToBuilder;
 import org.globsframework.saxstack.utils.XmlUtils;
 import org.globsframework.saxstack.writer.RootXmlTag;
-import org.globsframework.saxstack.writer.XmlWriter;
 import org.globsframework.xml.XmlGlobWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,6 +25,7 @@ import java.util.*;
 
 public class XmlGlobReader {
     private static final Logger LOGGER = LoggerFactory.getLogger(XmlGlobReader.class);
+    public static final String TYPE_ATTR = "__type__";
 
     public static Glob read(GlobTypeAccessor globTypeAccessor, Reader reader) {
         return read(globTypeAccessor, reader, false);
@@ -191,6 +191,24 @@ public class XmlGlobReader {
         }
     }
 
+    static class GlobUnionManageFieldNode implements ManageFieldNode {
+        private final GlobTypeXmlNodeModelService nodeModelService;
+        private final GlobUnionField field;
+
+        public GlobUnionManageFieldNode(GlobUnionField field, GlobTypeXmlNodeModelService nodeModelService) {
+            this.nodeModelService = nodeModelService;
+            this.field = field;
+        }
+
+        public XmlNode fillFromSubNode(MutableGlob mutableGlob, String childName, Attributes xmlAttrs) {
+            final String typeName = xmlAttrs.getValue(TYPE_ATTR);
+            GlobType type = field.getTargetType(typeName);
+            MutableGlob instantiate = type.instantiate();
+            mutableGlob.set(field, instantiate);
+            return new GlobTypeXmlNode(nodeModelService, instantiate, xmlAttrs);
+        }
+    }
+
     static class GlobArrayManageFieldNode implements ManageFieldNode {
         private final GlobTypeXmlNodeModelService nodeModelService;
         private final GlobArrayField field;
@@ -202,6 +220,27 @@ public class XmlGlobReader {
 
         public XmlNode fillFromSubNode(MutableGlob mutableGlob, String childName, Attributes xmlAttrs) {
             GlobType type = field.getTargetType();
+            MutableGlob instantiate = type.instantiate();
+            Glob[] globs = mutableGlob.get(field);
+            Glob[] values = globs != null ? Arrays.copyOf(globs, globs.length + 1) : new Glob[1];
+            values[values.length - 1] = instantiate;
+            mutableGlob.set(field, values);
+            return new GlobTypeXmlNode(nodeModelService, instantiate, xmlAttrs);
+        }
+    }
+
+    static class GlobUnionArrayManageFieldNode implements ManageFieldNode {
+        private final GlobTypeXmlNodeModelService nodeModelService;
+        private final GlobArrayUnionField field;
+
+        public GlobUnionArrayManageFieldNode(GlobTypeXmlNodeModelService nodeModelService, GlobArrayUnionField field) {
+            this.nodeModelService = nodeModelService;
+            this.field = field;
+        }
+
+        public XmlNode fillFromSubNode(MutableGlob mutableGlob, String childName, Attributes xmlAttrs) {
+            final String typeName = xmlAttrs.getValue(TYPE_ATTR);
+            GlobType type = field.getTargetType(typeName);
             MutableGlob instantiate = type.instantiate();
             Glob[] globs = mutableGlob.get(field);
             Glob[] values = globs != null ? Arrays.copyOf(globs, globs.length + 1) : new Glob[1];
@@ -534,6 +573,14 @@ public class XmlGlobReader {
 
             public void visitGlob(GlobField field) throws Exception {
                 manageFieldNode = new GlobManageFieldNode(field, nodeModelService);
+            }
+
+            public void visitUnionGlob(GlobUnionField field) throws Exception {
+                manageFieldNode = new GlobUnionManageFieldNode(field, nodeModelService);
+            }
+
+            public void visitUnionGlobArray(GlobArrayUnionField field) throws Exception {
+                manageFieldNode = new GlobUnionArrayManageFieldNode(nodeModelService, field);
             }
 
             public void visitGlobArray(GlobArrayField field) throws Exception {
