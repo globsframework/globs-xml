@@ -26,7 +26,6 @@ public class XmlGlobParserTest {
         repository = GlobRepositoryBuilder.createEmpty();
     }
 
-
     @Test
     public void testStandardCase() throws Exception {
         parse("<dummyObject id='1' name='foo'/>");

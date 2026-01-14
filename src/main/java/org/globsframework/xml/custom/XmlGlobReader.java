@@ -110,6 +110,22 @@ public class XmlGlobReader {
         }
     }
 
+    static class DoubleManageFieldNode implements ManageFieldNode {
+        DoubleField field;
+
+        public DoubleManageFieldNode(DoubleField field) {
+            this.field = field;
+        }
+
+        public XmlNode fillFromSubNode(MutableGlob mutableGlob, String childName, Attributes xmlAttrs) {
+            return new DefaultXmlNode() {
+                public void setValue(String value) {
+                    mutableGlob.set(field, Double.parseDouble(value));
+                }
+            };
+        }
+    }
+
     static class LongManageFieldNode implements ManageFieldNode {
         LongField field;
 
@@ -557,6 +573,10 @@ public class XmlGlobReader {
 
             public void visitStringArray(StringArrayField field) throws Exception {
                 manageFieldNode = new StringArrayManageFieldNode(field);
+            }
+
+            public void visitDouble(DoubleField field) throws Exception {
+                manageFieldNode = new DoubleManageFieldNode(field);
             }
 
             public void visitInteger(IntegerField field) throws Exception {

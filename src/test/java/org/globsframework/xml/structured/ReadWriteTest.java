@@ -23,6 +23,7 @@ public class ReadWriteTest {
                 .set(DummyObject.SIMPLE_SUB, create("sub1", 2))
                 .set(DummyObject.SIMPLE_SUB_ARRAY, new Glob[]{create("sub2", 3), create("sub 4", 4)})
                 .set(DummyObject.SIMPLE_SUB_UNION, create("sub 5", 5))
+                .set(DummyObject.DOUBLE_VALUE, 12.3)
                 ;
 
         StringWriter stringWriter = new StringWriter();
@@ -34,6 +35,9 @@ public class ReadWriteTest {
                                 <subName>sub1</subName>
                                 <count>2</count>
                             </SIMPLE>
+                              <doubleValue>
+                                12.3
+                              </doubleValue>
                             <simpleSubArray longValue="3">
                                 <subName>
                                     sub2
@@ -110,10 +114,13 @@ public class ReadWriteTest {
 
     }
 
+
+
     private MutableGlob create(String name, int count) {
         return SubDummy.TYPE.instantiate()
                 .set(SubDummy.SUB_NAME, name)
                 .set(SubDummy.COUNT, count)
-                .set(SubDummy.longValue, count);
+                .set(SubDummy.longValue, count)
+                ;
     }
 }
