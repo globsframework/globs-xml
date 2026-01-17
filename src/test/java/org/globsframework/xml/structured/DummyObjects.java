@@ -1,11 +1,15 @@
 package org.globsframework.xml.structured;
 
 import org.globsframework.core.metamodel.GlobType;
-import org.globsframework.core.metamodel.GlobTypeLoaderFactory;
+import org.globsframework.core.metamodel.GlobTypeBuilder;
+import org.globsframework.core.metamodel.GlobTypeBuilderFactory;
 import org.globsframework.core.metamodel.annotations.Target;
 import org.globsframework.core.metamodel.annotations.Targets;
 import org.globsframework.core.metamodel.fields.*;
+import org.globsframework.xml.custom.XmlAsNode;
 import org.globsframework.xml.custom.XmlNode_;
+
+import java.util.function.Supplier;
 
 public class DummyObjects {
 
@@ -29,10 +33,14 @@ public class DummyObjects {
         @Targets({SubDummy.class, SubDummy2.class})
         public static GlobUnionField SIMPLE_SUB_UNION;
 
-//        public static GlobArrayUnionField SIMPLE_SUB_ARRAY;
-
         static {
-            GlobTypeLoaderFactory.create(DummyObject.class, true).load();
+            GlobTypeBuilder typeBuilder =  GlobTypeBuilderFactory.create("dummyObject");
+            NAME = typeBuilder.declareStringField("name", XmlAsNode.UNIQUE_INSTANCE);
+            DOUBLE_VALUE = typeBuilder.declareDoubleField("doubleValue", XmlAsNode.UNIQUE_INSTANCE);
+            SIMPLE_SUB = typeBuilder.declareGlobField("simpleSub", () -> SubDummy.TYPE, XmlAsNode.create("SIMPLE"));
+            SIMPLE_SUB_ARRAY = typeBuilder.declareGlobArrayField("simpleSubArray", () -> SubDummy.TYPE, XmlAsNode.UNIQUE_INSTANCE);
+            SIMPLE_SUB_UNION = typeBuilder.declareGlobUnionField("simpleSubUnion", new Supplier[]{() -> SubDummy.TYPE, () -> SubDummy2.TYPE});
+            TYPE = typeBuilder.build();
         }
     }
 
@@ -48,16 +56,23 @@ public class DummyObjects {
         public static IntegerField COUNT;
 
         static {
-            GlobTypeLoaderFactory.createAndLoad(SubDummy.class, true);
+            GlobTypeBuilder typeBuilder =  GlobTypeBuilderFactory.create("subDummy");
+            longValue = typeBuilder.declareLongField("longValue");
+            SUB_NAME = typeBuilder.declareStringField("subName", XmlAsNode.UNIQUE_INSTANCE);
+            COUNT = typeBuilder.declareIntegerField("count", XmlAsNode.UNIQUE_INSTANCE);
+            TYPE = typeBuilder.build();
         }
     }
 
     public static class SubDummy2 {
         public static GlobType TYPE;
+
         public static LongField name;
 
         static {
-            GlobTypeLoaderFactory.createAndLoad(SubDummy2.class, true);
+            GlobTypeBuilder typeBuilder =  GlobTypeBuilderFactory.create("subDummy2");
+            name = typeBuilder.declareLongField("name");
+            TYPE = typeBuilder.build();
         }
     }
 }

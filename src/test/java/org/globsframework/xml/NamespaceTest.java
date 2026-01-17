@@ -1,7 +1,8 @@
 package org.globsframework.xml;
 
 import org.globsframework.core.metamodel.GlobType;
-import org.globsframework.core.metamodel.GlobTypeLoaderFactory;
+import org.globsframework.core.metamodel.GlobTypeBuilder;
+import org.globsframework.core.metamodel.GlobTypeBuilderFactory;
 import org.globsframework.core.metamodel.annotations.FieldName_;
 import org.globsframework.core.metamodel.annotations.Target;
 import org.globsframework.core.metamodel.fields.GlobField;
@@ -73,7 +74,10 @@ public class NamespaceTest {
         public static GlobField body;
 
         static {
-            GlobTypeLoaderFactory.create(Y2EnvelopeType.class, "Envelope").load();
+            GlobTypeBuilder typeBuilder = GlobTypeBuilderFactory.create("Envelope");
+            header = typeBuilder.declareStringField("Header", XmlAsNode.UNIQUE_INSTANCE);
+            body = typeBuilder.declareGlobField("Body", () -> Y2SoapBodyType.TYPE);
+            TYPE = typeBuilder.build();
         }
     }
 
@@ -85,7 +89,9 @@ public class NamespaceTest {
         public static GlobField getCustomerDetailRequest;
 
         static {
-            GlobTypeLoaderFactory.create(Y2SoapBodyType.class).load();
+            GlobTypeBuilder typeBuilder = GlobTypeBuilderFactory.create("Y2SoapBodyType");
+            getCustomerDetailRequest = typeBuilder.declareGlobField("GetCustomerDetail", () -> Y2GetCustomerDetailRequest.TYPE);
+            TYPE = typeBuilder.build();
         }
     }
 
@@ -103,7 +109,11 @@ public class NamespaceTest {
         public static GlobField priosWithParentNS;
 
         static {
-            GlobTypeLoaderFactory.create(Y2GetCustomerDetailRequest.class).load();
+            GlobTypeBuilder typeBuilder = GlobTypeBuilderFactory.create("Y2GetCustomerDetailRequest");
+            customerId = typeBuilder.declareStringField("customerId", XmlAsNode.UNIQUE_INSTANCE);
+            priosWithParentNS = typeBuilder.declareGlobField("priosWithParentNS", () -> Y2GetCustomerDetailRequest.TYPE, XmlAsNode.UNIQUE_INSTANCE,
+                    XmlUseParentNS.useParentNS);
+            TYPE = typeBuilder.build();
         }
 
     }
@@ -117,7 +127,8 @@ public class NamespaceTest {
         public static StringField customerId;
 
         static {
-            GlobTypeLoaderFactory.create(PriosOtherDetailRequest.class).load();
+            GlobTypeBuilder typeBuilder = GlobTypeBuilderFactory.create("PriosOtherDetailRequest");
+            typeBuilder.addAnnotation(XmlNS.create("prios", "http://www.prios.fr"));
         }
 
     }

@@ -1,6 +1,7 @@
 package org.globsframework.xml;
 
 import org.globsframework.core.metamodel.*;
+import org.globsframework.core.metamodel.annotations.KeyField;
 import org.globsframework.core.metamodel.annotations.KeyField_;
 import org.globsframework.core.metamodel.annotations.Target;
 import org.globsframework.core.metamodel.fields.IntegerField;
@@ -151,12 +152,14 @@ public class XmlGlobParserTest {
         public static Link OBJ2;
 
         static {
-            GlobTypeLoader loader = GlobTypeLoaderFactory.create(AnObjectLinkingToATypeWithNoNamingField.class, true);
-            loader.register(MutableGlobLinkModel.LinkRegister.class,
+            GlobTypeBuilder typeBuilder = GlobTypeBuilderFactory.create("anObjectLinkingToATypeWithNoNamingField");
+            ID = typeBuilder.declareIntegerField("id", KeyField.ZERO);
+            OBJ2_ID = typeBuilder.declareIntegerField("obj2Id");
+            typeBuilder.register(MutableGlobLinkModel.LinkRegister.class,
                     mutableGlobLinkModel ->
-                            OBJ2 = mutableGlobLinkModel.getLinkBuilder(OBJ2)
+                            OBJ2 = mutableGlobLinkModel.getLinkBuilder(null, "obj2")
                                     .add(OBJ2_ID, DummyObject2.ID).publish());
-            loader.load();
+            TYPE = typeBuilder.build();
         }
     }
 
@@ -214,7 +217,9 @@ public class XmlGlobParserTest {
         public static IntegerField ID;
 
         static {
-            GlobTypeLoaderFactory.createAndLoad(AnObject.class, true);
+            GlobTypeBuilder typeBuilder = GlobTypeBuilderFactory.create("anObject");
+            ID = typeBuilder.declareIntegerField("id", KeyField.ZERO);
+            TYPE = typeBuilder.build();
         }
     }
 
@@ -234,18 +239,21 @@ public class XmlGlobParserTest {
         public static Link LINK2;
 
         static {
-            GlobTypeLoader loader = GlobTypeLoaderFactory.create(AnObjectWithTwoLinks.class, true);
-            loader.register(MutableGlobLinkModel.LinkRegister.class,
+            GlobTypeBuilder  typeBuilder = GlobTypeBuilderFactory.create("anObjectWithTwoLinks");
+            ID = typeBuilder.declareIntegerField("id", KeyField.ZERO);
+            LINK1_ID = typeBuilder.declareIntegerField("link1Id");
+            LINK2_ID = typeBuilder.declareIntegerField("link2Id");
+            typeBuilder.register(MutableGlobLinkModel.LinkRegister.class,
                     mutableGlobLinkModel ->
                     {
-                        mutableGlobLinkModel.getDirectLinkBuilder(LINK1)
+                        LINK1 = mutableGlobLinkModel.getDirectLinkBuilder(null, "link1")
                                 .add(LINK1_ID, AnObject.ID)
                                 .publish();
-                        mutableGlobLinkModel.getDirectLinkBuilder(LINK2)
+                        LINK2 = mutableGlobLinkModel.getDirectLinkBuilder(null, "link2")
                                 .add(LINK2_ID, AnObject.ID)
                                 .publish();
                     });
-            loader.load();
+            TYPE = typeBuilder.build();
         }
     }
 

@@ -6,6 +6,7 @@ import org.globsframework.core.metamodel.GlobTypeBuilderFactory;
 import org.globsframework.core.metamodel.annotations.GlobCreateFromAnnotation;
 import org.globsframework.core.metamodel.annotations.InitUniqueKey;
 import org.globsframework.core.metamodel.fields.StringField;
+import org.globsframework.core.model.Glob;
 import org.globsframework.core.model.Key;
 import org.globsframework.core.model.KeyBuilder;
 import org.globsframework.core.model.MutableGlob;
@@ -23,15 +24,17 @@ public class XmlNS {
 
     static {
         GlobTypeBuilder typeBuilder = GlobTypeBuilderFactory.create("XmlNS");
-        TYPE = typeBuilder.unCompleteType();
         name = typeBuilder.declareStringField("name");
         url = typeBuilder.declareStringField("url");
-        typeBuilder.complete();
-        UNIQUE_KEY = KeyBuilder.newEmptyKey(TYPE);
         typeBuilder.register(GlobCreateFromAnnotation.class, annotation -> create((XmlNS_) annotation));
-//        GlobTypeLoaderFactory.create(XmlNS.class, "XmlNS")
-//                .register(GlobCreateFromAnnotation.class, annotation -> create((XmlNS_) annotation))
-//                .load();
+        TYPE = typeBuilder.build();
+        UNIQUE_KEY = KeyBuilder.newEmptyKey(TYPE);
+    }
+
+    public static Glob create(String name, String url) {
+        return TYPE.instantiate()
+                .set(XmlNS.name, name)
+                .set(XmlNS.url, url);
     }
 
     private static MutableGlob create(XmlNS_ annotation) {
