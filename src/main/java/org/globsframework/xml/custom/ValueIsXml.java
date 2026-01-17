@@ -31,21 +31,19 @@ public class ValueIsXml {
 
     static {
         GlobTypeBuilder typeBuilder = GlobTypeBuilderFactory.create("ValueIsXml");
-        TYPE = typeBuilder.unCompleteType();
         NAME = typeBuilder.declareStringField("name");
-        typeBuilder.complete();
+        typeBuilder.register(GlobCreateFromAnnotation.class, annotation -> createAnnotation((ValueIsXml_) annotation));
+        TYPE = typeBuilder.build();
         UNIQUE_KEY = KeyBuilder.newEmptyKey(TYPE);
-        typeBuilder.register(GlobCreateFromAnnotation.class, annotation -> {
-            final MutableGlob instantiate = TYPE.instantiate();
-            if (Strings.isNotEmpty(((ValueIsXml_) annotation).value())) {
-                instantiate.set(NAME, ((ValueIsXml_) annotation).value());
-            }
-            return instantiate;
-        });
         DEFAULT = TYPE.instantiate();
-//        GlobTypeLoaderFactory.create(XmlValue.class, "_XmlValue")
-//                .register(GlobCreateFromAnnotation.class, annotation -> UNIQUE_GLOB)
-//                .load();
+    }
+
+    private static MutableGlob createAnnotation(ValueIsXml_ annotation) {
+        final MutableGlob instantiate = TYPE.instantiate();
+        if (Strings.isNotEmpty(annotation.value())) {
+            instantiate.set(NAME, annotation.value());
+        }
+        return instantiate;
     }
 
 }

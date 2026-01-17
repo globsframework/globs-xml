@@ -1,10 +1,13 @@
 package org.globsframework.xml.structured;
 
 import org.globsframework.core.metamodel.GlobType;
-import org.globsframework.core.metamodel.GlobTypeLoaderFactory;
+import org.globsframework.core.metamodel.GlobTypeBuilder;
+import org.globsframework.core.metamodel.GlobTypeBuilderFactory;
 import org.globsframework.core.metamodel.fields.StringField;
 import org.globsframework.core.model.Glob;
+import org.globsframework.xml.custom.ValueIsXml;
 import org.globsframework.xml.custom.ValueIsXml_;
+import org.globsframework.xml.custom.XmlValue;
 
 public class DataWithInnerXml {
     public static GlobType TYPE;
@@ -15,7 +18,10 @@ public class DataWithInnerXml {
     public static StringField subXml;
 
     static {
-        GlobTypeLoaderFactory.create(DataWithInnerXml.class).load();
+        GlobTypeBuilder typeBuilder =   GlobTypeBuilderFactory.create("DataWithInnerXml");
+        name = typeBuilder.declareStringField("name");
+        subXml = typeBuilder.declareStringField("subXml", ValueIsXml.create("SUB_XML"));
+        TYPE = typeBuilder.build();
     }
 
     public static Glob create(String name, String xml) {

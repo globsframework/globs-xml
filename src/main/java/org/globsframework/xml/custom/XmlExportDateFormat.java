@@ -6,8 +6,10 @@ import org.globsframework.core.metamodel.GlobTypeBuilderFactory;
 import org.globsframework.core.metamodel.annotations.GlobCreateFromAnnotation;
 import org.globsframework.core.metamodel.annotations.InitUniqueKey;
 import org.globsframework.core.metamodel.fields.StringField;
+import org.globsframework.core.model.Glob;
 import org.globsframework.core.model.Key;
 import org.globsframework.core.model.KeyBuilder;
+import org.globsframework.core.model.MutableGlob;
 
 public class XmlExportDateFormat {
     public static final GlobType TYPE;
@@ -21,21 +23,22 @@ public class XmlExportDateFormat {
 
     static {
         GlobTypeBuilder typeBuilder = GlobTypeBuilderFactory.create("XmlExportDateFormat");
-        TYPE = typeBuilder.unCompleteType();
         FORMAT = typeBuilder.declareStringField("format");
         ZONE_ID = typeBuilder.declareStringField("zoneId");
-        typeBuilder.complete();
+        typeBuilder.register(GlobCreateFromAnnotation.class, annotation -> createAnnotation((XmlExportDateFormat_) annotation));
+        TYPE = typeBuilder.build();
         UNIQUE_KEY = KeyBuilder.newEmptyKey(TYPE);
-        typeBuilder.register(GlobCreateFromAnnotation.class, annotation -> TYPE.instantiate()
-                .set(FORMAT, ((XmlExportDateFormat_) annotation).value())
-                .set(ZONE_ID, ((XmlExportDateFormat_) annotation).zoneId()));
-
-//        GlobTypeLoaderFactory.create(XmlExportDateFormat.class, "XmlExportDateFormat")
-//                .register(GlobCreateFromAnnotation.class, annotation -> TYPE.instantiate()
-//                        .set(FORMAT, ((XmlExportDateFormat_) annotation).value())
-//                        .set(ZONE_ID, ((XmlExportDateFormat_) annotation).zoneId())
-//                )
-//                .load();
     }
 
+    private static MutableGlob createAnnotation(XmlExportDateFormat_ annotation) {
+        return TYPE.instantiate()
+                .set(FORMAT, annotation.value())
+                .set(ZONE_ID, annotation.zoneId());
+    }
+
+    public static Glob create(String format, String zone) {
+        return TYPE.instantiate()
+                .set(FORMAT, format)
+                .set(ZONE_ID, zone);
+    }
 }

@@ -40,11 +40,10 @@ public class XmlAsNode {
 
     static {
         GlobTypeBuilder typeBuilder = GlobTypeBuilderFactory.create("XmlAsNode");
-        TYPE = typeBuilder.unCompleteType();
         NAME = typeBuilder.declareStringField("name");
         MANDATORY = typeBuilder.declareBooleanField("mandatory");
-        typeBuilder.complete();
         typeBuilder.register(GlobCreateFromAnnotation.class, annotation -> create((XmlNode_) annotation));
+        TYPE = typeBuilder.build();
         UNIQUE_KEY = KeyBuilder.newEmptyKey(TYPE);
         UNIQUE_INSTANCE = TYPE.instantiate();
     }
