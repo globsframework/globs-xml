@@ -22,19 +22,37 @@ import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAccessor;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class XmlGlobReader {
     private static final Logger LOGGER = LoggerFactory.getLogger(XmlGlobReader.class);
     public static final String TYPE_ATTR = "__type__";
+    public static final org.xml.sax.XMLReader XML_READER = XmlUtils.getXmlReader();
 
     public static Glob read(GlobTypeAccessor globTypeAccessor, Reader reader) {
         return read(globTypeAccessor, reader, false);
     }
 
+    public interface GlobReader {
+        Glob read(Reader reader);
+    }
+
+    public static GlobReader reader(GlobTypeAccessor globTypeAccessor, boolean defaultToXmlNode) {
+        GlobTypeXmlNodeModelService globTypeXmlNodeModelService = new GlobTypeXmlNodeModelService(defaultToXmlNode);
+        return new GlobReader() {
+            @Override
+            public Glob read(Reader reader) {
+                RootGlobXmlNode rootNode = new RootGlobXmlNode(globTypeAccessor, globTypeXmlNodeModelService);
+                SaxStackParser.parse(XML_READER, rootNode, reader);
+                return rootNode.mutableGlob;
+            }
+        };
+    }
+
     public static Glob read(GlobTypeAccessor globTypeAccessor, Reader reader, boolean defaultToXmlNode) {
         GlobTypeXmlNodeModelService globTypeXmlNodeModelService = new GlobTypeXmlNodeModelService(defaultToXmlNode);
         RootGlobXmlNode rootNode = new RootGlobXmlNode(globTypeAccessor, globTypeXmlNodeModelService);
-        SaxStackParser.parse(XmlUtils.getXmlReader(), rootNode, reader);
+        SaxStackParser.parse(XML_READER, rootNode, reader);
         return rootNode.mutableGlob;
     }
 
@@ -266,21 +284,17 @@ public class XmlGlobReader {
         }
     }
 
-    static class GlobTypeXmlNodeModelService {
+    final static class GlobTypeXmlNodeModelService {
         private final boolean defaultToXmlNode;
-        Map<GlobType, GlobTypXmlNodeModel> xmlNodeModel = new HashMap<>();
+        private final Map<GlobType, GlobTypXmlNodeModel> xmlNodeModel = new ConcurrentHashMap<>();
 
         public GlobTypeXmlNodeModelService(boolean defaultToXmlNode) {
             this.defaultToXmlNode = defaultToXmlNode;
         }
 
         public GlobTypXmlNodeModel get(GlobType globType) {
-            GlobTypXmlNodeModel globTypXmlNodeModel = xmlNodeModel.get(globType);
-            if (globTypXmlNodeModel == null) {
-                globTypXmlNodeModel = new GlobTypXmlNodeModel(globType, this);
-                xmlNodeModel.put(globType, globTypXmlNodeModel);
-            }
-            return globTypXmlNodeModel;
+            return xmlNodeModel.computeIfAbsent(globType,
+                    globType1 -> new GlobTypXmlNodeModel(globType1, this));
         }
     }
 
@@ -488,6 +502,19 @@ public class XmlGlobReader {
         }
     }
 
+    static class BooleanFieldReader extends AbstractManageFieldAttr {
+        private final BooleanField field;
+
+        BooleanFieldReader(BooleanField field, String xmlName) {
+            super(xmlName);
+            this.field = field;
+        }
+
+        void update(MutableGlob mutableGlob, String value) {
+            mutableGlob.set(field, value.equalsIgnoreCase("true"));
+        }
+    }
+
 
     static class GlobTypXmlNodeModel {
         private final GlobTypeXmlNodeModelService nodeModelService;
@@ -685,6 +712,10 @@ public class XmlGlobReader {
 
             public void visitDateTime(DateTimeField field) throws Exception {
                 manageFieldAttr = new DateTimeFieldReader(field, xmlName);
+            }
+
+            public void visitBoolean(BooleanField field) throws Exception {
+                manageFieldAttr = new BooleanFieldReader(field, xmlName);
             }
         }
 

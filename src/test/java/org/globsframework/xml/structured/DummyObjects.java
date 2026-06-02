@@ -14,28 +14,31 @@ import java.util.function.Supplier;
 public class DummyObjects {
 
     public static class DummyObject {
-        public static GlobType TYPE;
+        public static final GlobType TYPE;
 
         @XmlNode_
-        public static StringField NAME;
+        public static final StringField NAME;
+
+        public static final BooleanField valid;
 
         @XmlNode_
-        public static DoubleField DOUBLE_VALUE;
+        public static final DoubleField DOUBLE_VALUE;
 
         @XmlNode_(name = "SIMPLE")
         @Target(SubDummy.class)
-        public static GlobField SIMPLE_SUB;
+        public static final GlobField SIMPLE_SUB;
 
         @XmlNode_
         @Target(SubDummy.class)
-        public static GlobArrayField SIMPLE_SUB_ARRAY;
+        public static final GlobArrayField SIMPLE_SUB_ARRAY;
 
         @Targets({SubDummy.class, SubDummy2.class})
-        public static GlobUnionField SIMPLE_SUB_UNION;
+        public static final GlobUnionField SIMPLE_SUB_UNION;
 
         static {
             GlobTypeBuilder typeBuilder =  GlobTypeBuilderFactory.create("dummyObject");
             NAME = typeBuilder.declareStringField("name", XmlAsNode.UNIQUE_INSTANCE);
+            valid = typeBuilder.declareBooleanField("valid");
             DOUBLE_VALUE = typeBuilder.declareDoubleField("doubleValue", XmlAsNode.UNIQUE_INSTANCE);
             SIMPLE_SUB = typeBuilder.declareGlobField("simpleSub", () -> SubDummy.TYPE, XmlAsNode.create("SIMPLE"));
             SIMPLE_SUB_ARRAY = typeBuilder.declareGlobArrayField("simpleSubArray", () -> SubDummy.TYPE, XmlAsNode.UNIQUE_INSTANCE);

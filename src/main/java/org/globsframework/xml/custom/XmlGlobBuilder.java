@@ -51,7 +51,10 @@ public class XmlGlobBuilder {
         XmlNamespace xmlNamespace = XmlNamespace.create(type, nsMapping);
         XmlTag xmlTag = XmlWriter.startTag(writer, xmlNamespace.addToTag(XmlGlobWriter.getXmlName(type)));
         xmlNamespace.addAttr(xmlTag);
-        data.safeAccept(new XmlFieldValueVisitor(xmlTag, xmlNamespace, defaultToXmlNode));
+        final XmlFieldValueVisitor functor = new XmlFieldValueVisitor(xmlTag, xmlNamespace, defaultToXmlNode, true);
+        data.safeAccept(functor);
+        functor.writeAttr = false;
+        data.safeAccept(functor);
         xmlTag.end();
     }
 
@@ -108,11 +111,13 @@ public class XmlGlobBuilder {
     private static class XmlFieldValueVisitor extends FieldValueVisitor.AbstractWithErrorVisitor {
         private XmlTag xmlTag;
         private final boolean defaultToXmlNode;
+        private boolean writeAttr;
         private Deque<XmlNamespace> ns = new ArrayDeque<>();
 
-        public XmlFieldValueVisitor(XmlTag xmlTag, XmlNamespace xmlNamespace, boolean defaultToXmlNode) {
+        public XmlFieldValueVisitor(XmlTag xmlTag, XmlNamespace xmlNamespace, boolean defaultToXmlNode, boolean writeAttr) {
             this.xmlTag = xmlTag;
             this.defaultToXmlNode = defaultToXmlNode;
+            this.writeAttr = writeAttr;
             ns.push(xmlNamespace);
         }
 
@@ -122,25 +127,31 @@ public class XmlGlobBuilder {
 
         private void dumpSimpleValue(Field field, String strValue) throws IOException {
             if (field.hasAnnotation(XmlValue.UNIQUE_KEY)) {
-                xmlTag.addValue(strValue);
+                if (!writeAttr) {
+                    xmlTag.addValue(strValue);
+                }
             } else {
                 final String xmlName = XmlGlobWriter.getXmlName(field);
                 final Glob xmlAsNode = field.findAnnotation(XmlAsNode.UNIQUE_KEY);
                 if (defaultToXmlNode || xmlAsNode != null) {
-                    if (strValue != null || (xmlAsNode != null && xmlAsNode.isTrue(XmlAsNode.MANDATORY))) {
-                        xmlTag = xmlTag.createChildTag(ns.element().addToTag(xmlAsNode != null ? xmlAsNode.getOrDefault(XmlAsNode.NAME, xmlName) : xmlName));
-                        if (strValue != null) {
-                            if (field.hasAnnotation(XmlValueAsCData.UNIQUE_KEY)) {
-                                xmlTag.addCDataValue(strValue);
-                            } else {
-                                xmlTag.addValue(strValue);
+                    if (!writeAttr) {
+                        if (strValue != null || (xmlAsNode != null && xmlAsNode.isTrue(XmlAsNode.MANDATORY))) {
+                            xmlTag = xmlTag.createChildTag(ns.element().addToTag(xmlAsNode != null ? xmlAsNode.getOrDefault(XmlAsNode.NAME, xmlName) : xmlName));
+                            if (strValue != null) {
+                                if (field.hasAnnotation(XmlValueAsCData.UNIQUE_KEY)) {
+                                    xmlTag.addCDataValue(strValue);
+                                } else {
+                                    xmlTag.addValue(strValue);
+                                }
                             }
+                            xmlTag = xmlTag.end();
                         }
-                        xmlTag = xmlTag.end();
                     }
                 } else {
                     if (strValue != null) {
-                        xmlTag.addAttribute(ns.element().addToTag(xmlName), strValue);
+                        if (writeAttr) {
+                            xmlTag.addAttribute(ns.element().addToTag(xmlName), strValue);
+                        }
                     }
                 }
             }
@@ -161,10 +172,12 @@ public class XmlGlobBuilder {
         public void visitString(StringField field, String value) throws Exception {
             final Glob valueIsXml = field.findAnnotation(ValueIsXml.UNIQUE_KEY);
             if (valueIsXml != null) {
-                String tmp = XmlGlobWriter.getXmlName(field);
-                xmlTag = xmlTag.createChildTag(ns.element().addToTag(valueIsXml.getOrDefault(ValueIsXml.NAME, tmp)));
-                xmlTag.addXmlSubtree(value);
-                xmlTag = xmlTag.end();
+                if (!writeAttr) {
+                    String tmp = XmlGlobWriter.getXmlName(field);
+                    xmlTag = xmlTag.createChildTag(ns.element().addToTag(valueIsXml.getOrDefault(ValueIsXml.NAME, tmp)));
+                    xmlTag.addXmlSubtree(value);
+                    xmlTag = xmlTag.end();
+                }
             }
             else {
                 dumpSimpleValue(field, value);
@@ -204,6 +217,9 @@ public class XmlGlobBuilder {
         }
 
         public void visitGlob(GlobField field, Glob value) throws Exception {
+            if (writeAttr) {
+                return;
+            }
             if (value != null) {
                 GlobType targetType = field.getTargetType();
                 final boolean useParent = field.findOptAnnotation(XmlUseParentNS.UNIQUE_KEY)
@@ -219,6 +235,9 @@ public class XmlGlobBuilder {
                     ns.push(ns.element().sub(targetType));
                 }
                 ns.element().addAttr(xmlTag);
+                writeAttr = true;
+                value.safeAccept(this);
+                writeAttr = false;
                 value.safeAccept(this);
                 xmlTag = xmlTag.end();
                 ns.pop();
@@ -227,6 +246,9 @@ public class XmlGlobBuilder {
 
         @Override
         public void visitUnionGlob(GlobUnionField field, Glob value) throws Exception {
+            if (writeAttr) {
+                return;
+            }
             if (value != null) {
                 GlobType targetType = value.getType();
                 final boolean useParent = field.findOptAnnotation(XmlUseParentNS.UNIQUE_KEY)
@@ -243,6 +265,9 @@ public class XmlGlobBuilder {
                     ns.push(ns.element().sub(targetType));
                 }
                 ns.element().addAttr(xmlTag);
+                writeAttr = true;
+                value.safeAccept(this);
+                writeAttr = false;
                 value.safeAccept(this);
                 xmlTag = xmlTag.end();
                 ns.pop();
@@ -251,6 +276,9 @@ public class XmlGlobBuilder {
 
         @Override
         public void visitUnionGlobArray(GlobArrayUnionField field, Glob[] value) throws Exception {
+            if (writeAttr) {
+                return;
+            }
             if (value != null && value.length != 0) {
                 for (Glob glob : value) {
                     if (glob == null) {
@@ -268,6 +296,9 @@ public class XmlGlobBuilder {
                         ns.push(ns.element().sub(targetType));
                     }
                     ns.element().addAttr(xmlTag);
+                    writeAttr = true;
+                    glob.safeAccept(this);
+                    writeAttr = false;
                     glob.safeAccept(this);
                     xmlTag = xmlTag.end();
                     ns.pop();
@@ -276,6 +307,9 @@ public class XmlGlobBuilder {
         }
 
         public void visitGlobArray(GlobArrayField field, Glob[] value) throws Exception {
+            if (writeAttr) {
+                return;
+            }
             if (value != null && value.length != 0) {
                 GlobType targetType = field.getTargetType();
                 for (Glob glob : value) {
@@ -289,6 +323,9 @@ public class XmlGlobBuilder {
                         ns.push(ns.element().sub(targetType));
                     }
                     ns.element().addAttr(xmlTag);
+                    writeAttr = true;
+                    glob.safeAccept(this);
+                    writeAttr = false;
                     glob.safeAccept(this);
                     xmlTag = xmlTag.end();
                     ns.pop();

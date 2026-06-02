@@ -20,6 +20,7 @@ public class ReadWriteTest {
     @Test
     public void writer() throws IOException {
         MutableGlob data = DummyObject.TYPE.instantiate().set(DummyObject.NAME, "dummy 1")
+                .set(DummyObject.valid, true)
                 .set(DummyObject.SIMPLE_SUB, create("sub1", 2))
                 .set(DummyObject.SIMPLE_SUB_ARRAY, new Glob[]{create("sub2", 3), create("sub 4", 4)})
                 .set(DummyObject.SIMPLE_SUB_UNION, create("sub 5", 5))
@@ -29,7 +30,7 @@ public class ReadWriteTest {
         StringWriter stringWriter = new StringWriter();
         XmlGlobBuilder.write(data, stringWriter);
         XmlTestUtils.assertEquivalent("""
-                        <dummyObject>
+                        <dummyObject valid="true">
                             <name>dummy 1</name>
                             <SIMPLE longValue="2">
                                 <subName>sub1</subName>
@@ -107,11 +108,19 @@ public class ReadWriteTest {
                                       "    </simpleSubArray>\n" +
                                       "</dummyObject>", stringWriter.toString());
 
-        Glob glob = XmlGlobReader.read(kind -> DummyObject.TYPE, new StringReader(stringWriter.toString()), true);
-        StringWriter newStr = new StringWriter();
-        XmlGlobBuilder.write(glob, newStr, true);
-        XmlTestUtils.assertEquivalent(stringWriter.toString(), newStr.toString());
-
+        {
+            Glob glob = XmlGlobReader.read(kind -> DummyObject.TYPE, new StringReader(stringWriter.toString()), true);
+            StringWriter newStr = new StringWriter();
+            XmlGlobBuilder.write(glob, newStr, true);
+            XmlTestUtils.assertEquivalent(stringWriter.toString(), newStr.toString());
+        }
+        {
+            final XmlGlobReader.GlobReader reader = XmlGlobReader.reader(kind -> DummyObject.TYPE, true);
+            Glob glob = reader.read(new StringReader(stringWriter.toString()));
+            StringWriter newStr = new StringWriter();
+            XmlGlobBuilder.write(glob, newStr, true);
+            XmlTestUtils.assertEquivalent(stringWriter.toString(), newStr.toString());
+        }
     }
 
 
