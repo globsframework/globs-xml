@@ -216,7 +216,7 @@ public class XmlGlobBuilder {
             }
         }
 
-        public void visitGlob(GlobField field, Glob value) throws Exception {
+        public void visitGlob(GlobField<?> field, Glob value) throws Exception {
             if (writeAttr) {
                 return;
             }
@@ -306,7 +306,7 @@ public class XmlGlobBuilder {
             }
         }
 
-        public void visitGlobArray(GlobArrayField field, Glob[] value) throws Exception {
+        public void visitGlobArray(GlobArrayField<?> field, Glob[] value) throws Exception {
             if (writeAttr) {
                 return;
             }

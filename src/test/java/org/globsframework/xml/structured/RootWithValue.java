@@ -10,7 +10,7 @@ public class RootWithValue {
     public static GlobType TYPE;
 
     @Target(DataWithMixValue.class)
-    public static GlobField dataWithValue;
+    public static GlobField<DataWithMixValue> dataWithValue;
 
     static {
         GlobTypeBuilder typeBuilder =  GlobTypeBuilderFactory.create("rootWithValue");

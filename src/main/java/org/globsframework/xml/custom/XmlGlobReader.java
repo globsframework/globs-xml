@@ -210,9 +210,9 @@ public class XmlGlobReader {
 
     static class GlobManageFieldNode implements ManageFieldNode {
         private final GlobTypeXmlNodeModelService nodeModelService;
-        private final GlobField field;
+        private final GlobField<?> field;
 
-        public GlobManageFieldNode(GlobField field, GlobTypeXmlNodeModelService nodeModelService) {
+        public GlobManageFieldNode(GlobField<?> field, GlobTypeXmlNodeModelService nodeModelService) {
             this.nodeModelService = nodeModelService;
             this.field = field;
         }
@@ -618,7 +618,7 @@ public class XmlGlobReader {
                 manageFieldNode = new DateTimeManageFieldNode(field);
             }
 
-            public void visitGlob(GlobField field) throws Exception {
+            public void visitGlob(GlobField<?> field) throws Exception {
                 manageFieldNode = new GlobManageFieldNode(field, nodeModelService);
             }
 
@@ -630,7 +630,7 @@ public class XmlGlobReader {
                 manageFieldNode = new GlobUnionArrayManageFieldNode(nodeModelService, field);
             }
 
-            public void visitGlobArray(GlobArrayField field) throws Exception {
+            public void visitGlobArray(GlobArrayField<?> field) throws Exception {
                 manageFieldNode = new GlobArrayManageFieldNode(nodeModelService, field);
             }
 

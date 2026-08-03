@@ -71,7 +71,7 @@ public class NamespaceTest {
 
         @FieldName_("Body")
         @Target(Y2SoapBodyType.class)
-        public static GlobField body;
+        public static GlobField<Y2SoapBodyType> body;
 
         static {
             GlobTypeBuilder typeBuilder = GlobTypeBuilderFactory.create("Envelope");
@@ -86,7 +86,7 @@ public class NamespaceTest {
 
         @FieldName_("GetCustomerDetail")
         @Target(Y2GetCustomerDetailRequest.class)
-        public static GlobField getCustomerDetailRequest;
+        public static GlobField<Y2GetCustomerDetailRequest> getCustomerDetailRequest;
 
         static {
             GlobTypeBuilder typeBuilder = GlobTypeBuilderFactory.create("Y2SoapBodyType");
@@ -106,7 +106,7 @@ public class NamespaceTest {
         @Target(PriosOtherDetailRequest.class)
         @XmlNode_
         @XmlUseParentNS_
-        public static GlobField priosWithParentNS;
+        public static GlobField<PriosOtherDetailRequest> priosWithParentNS;
 
         static {
             GlobTypeBuilder typeBuilder = GlobTypeBuilderFactory.create("Y2GetCustomerDetailRequest");

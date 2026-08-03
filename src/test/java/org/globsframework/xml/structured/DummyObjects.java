@@ -26,11 +26,11 @@ public class DummyObjects {
 
         @XmlNode_(name = "SIMPLE")
         @Target(SubDummy.class)
-        public static final GlobField SIMPLE_SUB;
+        public static final GlobField<SubDummy> SIMPLE_SUB;
 
         @XmlNode_
         @Target(SubDummy.class)
-        public static final GlobArrayField SIMPLE_SUB_ARRAY;
+        public static final GlobArrayField<SubDummy> SIMPLE_SUB_ARRAY;
 
         @Targets({SubDummy.class, SubDummy2.class})
         public static final GlobUnionField SIMPLE_SUB_UNION;
