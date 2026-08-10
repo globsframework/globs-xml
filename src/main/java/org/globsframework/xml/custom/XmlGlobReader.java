@@ -245,9 +245,9 @@ public class XmlGlobReader {
 
     static class GlobArrayManageFieldNode implements ManageFieldNode {
         private final GlobTypeXmlNodeModelService nodeModelService;
-        private final GlobArrayField field;
+        private final GlobArrayField<?> field;
 
-        public GlobArrayManageFieldNode(GlobTypeXmlNodeModelService nodeModelService, GlobArrayField field) {
+        public GlobArrayManageFieldNode(GlobTypeXmlNodeModelService nodeModelService, GlobArrayField<?> field) {
             this.nodeModelService = nodeModelService;
             this.field = field;
         }
