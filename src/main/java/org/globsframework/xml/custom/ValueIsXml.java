@@ -3,7 +3,6 @@ package org.globsframework.xml.custom;
 import org.globsframework.core.metamodel.GlobType;
 import org.globsframework.core.metamodel.GlobTypeBuilder;
 import org.globsframework.core.metamodel.GlobTypeBuilderFactory;
-import org.globsframework.core.metamodel.annotations.GlobCreateFromAnnotation;
 import org.globsframework.core.metamodel.fields.StringField;
 import org.globsframework.core.model.Glob;
 import org.globsframework.core.model.Key;
@@ -32,18 +31,8 @@ public class ValueIsXml {
     static {
         GlobTypeBuilder typeBuilder = GlobTypeBuilderFactory.create("ValueIsXml");
         NAME = typeBuilder.declareStringField("name");
-        typeBuilder.register(GlobCreateFromAnnotation.class, annotation -> createAnnotation((ValueIsXml_) annotation));
         TYPE = typeBuilder.build();
         UNIQUE_KEY = KeyBuilder.newEmptyKey(TYPE);
         DEFAULT = TYPE.instantiate();
     }
-
-    private static MutableGlob createAnnotation(ValueIsXml_ annotation) {
-        final MutableGlob instantiate = TYPE.instantiate();
-        if (Strings.isNotEmpty(annotation.value())) {
-            instantiate.set(NAME, annotation.value());
-        }
-        return instantiate;
-    }
-
 }

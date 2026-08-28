@@ -16,15 +16,12 @@ public class DataWithMixValue {
 
     public static DoubleField valueAsAttrDouble;
 
-    @XmlExportDateFormat_(value = "yyyy-MM-dd'T'HH:mm:ss", zoneId = "Europe/Paris")
     public static DateTimeField valueAsAttrDateTime;
 
     public static DateTimeField correctDate;
 
-    @XmlNode_
     public static StringArrayField array;
 
-    @XmlValue_
     public static StringField valueAsValue;
 
     static {

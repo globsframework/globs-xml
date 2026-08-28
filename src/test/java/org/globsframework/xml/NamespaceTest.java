@@ -3,8 +3,6 @@ package org.globsframework.xml;
 import org.globsframework.core.metamodel.GlobType;
 import org.globsframework.core.metamodel.GlobTypeBuilder;
 import org.globsframework.core.metamodel.GlobTypeBuilderFactory;
-import org.globsframework.core.metamodel.annotations.FieldName_;
-import org.globsframework.core.metamodel.annotations.Target;
 import org.globsframework.core.metamodel.fields.GlobField;
 import org.globsframework.core.metamodel.fields.StringField;
 import org.globsframework.core.model.Glob;
@@ -62,19 +60,15 @@ public class NamespaceTest {
     }
 
     public static class Y2EnvelopeType {
-        @XmlNS_(url = "http://schemas.xmlsoap.org/soap/envelope/", name = "soapenv")
         public static GlobType TYPE;
 
-        @XmlNode_(mandatory = true)
-        @FieldName_("Header")
         public static StringField header;
 
-        @FieldName_("Body")
-        @Target(Y2SoapBodyType.class)
         public static GlobField<Y2SoapBodyType> body;
 
         static {
             GlobTypeBuilder typeBuilder = GlobTypeBuilderFactory.create("Envelope");
+            typeBuilder.addAnnotation(XmlNS.create("soapenv", "http://schemas.xmlsoap.org/soap/envelope/"));
             header = typeBuilder.declareStringField("Header", XmlAsNode.UNIQUE_INSTANCE);
             body = typeBuilder.declareGlobField("Body", () -> Y2SoapBodyType.TYPE);
             TYPE = typeBuilder.build();
@@ -84,8 +78,6 @@ public class NamespaceTest {
     public static class Y2SoapBodyType {
         public static GlobType TYPE;
 
-        @FieldName_("GetCustomerDetail")
-        @Target(Y2GetCustomerDetailRequest.class)
         public static GlobField<Y2GetCustomerDetailRequest> getCustomerDetailRequest;
 
         static {
@@ -96,20 +88,15 @@ public class NamespaceTest {
     }
 
     public static class Y2GetCustomerDetailRequest {
-        @XmlNS_(url = "http://www.cegid.fr/Retail/1.0")
         public static GlobType TYPE;
 
-        @XmlNode_
-        @FieldName_("customerId")
         public static StringField customerId;
 
-        @Target(PriosOtherDetailRequest.class)
-        @XmlNode_
-        @XmlUseParentNS_
         public static GlobField<PriosOtherDetailRequest> priosWithParentNS;
 
         static {
             GlobTypeBuilder typeBuilder = GlobTypeBuilderFactory.create("Y2GetCustomerDetailRequest");
+            typeBuilder.addAnnotation(XmlNS.create("", "http://www.cegid.fr/Retail/1.0"));
             customerId = typeBuilder.declareStringField("customerId", XmlAsNode.UNIQUE_INSTANCE);
             priosWithParentNS = typeBuilder.declareGlobField("priosWithParentNS", () -> Y2GetCustomerDetailRequest.TYPE, XmlAsNode.UNIQUE_INSTANCE,
                     XmlUseParentNS.useParentNS);
@@ -119,16 +106,15 @@ public class NamespaceTest {
     }
 
     public static class PriosOtherDetailRequest {
-        @XmlNS_(url = "http://www.prios.fr", name = "prios")
         public static GlobType TYPE;
 
-        @XmlNode_
-        @FieldName_("customerId")
         public static StringField customerId;
 
         static {
             GlobTypeBuilder typeBuilder = GlobTypeBuilderFactory.create("PriosOtherDetailRequest");
             typeBuilder.addAnnotation(XmlNS.create("prios", "http://www.prios.fr"));
+            customerId = typeBuilder.declareStringField("customerId", XmlAsNode.UNIQUE_INSTANCE);
+            TYPE = typeBuilder.build();
         }
 
     }

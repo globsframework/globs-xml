@@ -6,15 +6,12 @@ import org.globsframework.core.metamodel.GlobTypeBuilderFactory;
 import org.globsframework.core.metamodel.fields.StringField;
 import org.globsframework.core.model.Glob;
 import org.globsframework.xml.custom.ValueIsXml;
-import org.globsframework.xml.custom.ValueIsXml_;
-import org.globsframework.xml.custom.XmlValue;
 
 public class DataWithInnerXml {
     public static GlobType TYPE;
 
     public static StringField name;
 
-    @ValueIsXml_("SUB_XML")
     public static StringField subXml;
 
     static {

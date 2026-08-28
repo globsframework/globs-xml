@@ -3,11 +3,8 @@ package org.globsframework.xml.structured;
 import org.globsframework.core.metamodel.GlobType;
 import org.globsframework.core.metamodel.GlobTypeBuilder;
 import org.globsframework.core.metamodel.GlobTypeBuilderFactory;
-import org.globsframework.core.metamodel.annotations.Target;
-import org.globsframework.core.metamodel.annotations.Targets;
 import org.globsframework.core.metamodel.fields.*;
 import org.globsframework.xml.custom.XmlAsNode;
-import org.globsframework.xml.custom.XmlNode_;
 
 import java.util.function.Supplier;
 
@@ -16,23 +13,16 @@ public class DummyObjects {
     public static class DummyObject {
         public static final GlobType TYPE;
 
-        @XmlNode_
         public static final StringField NAME;
 
         public static final BooleanField valid;
 
-        @XmlNode_
         public static final DoubleField DOUBLE_VALUE;
 
-        @XmlNode_(name = "SIMPLE")
-        @Target(SubDummy.class)
         public static final GlobField<SubDummy> SIMPLE_SUB;
 
-        @XmlNode_
-        @Target(SubDummy.class)
         public static final GlobArrayField<SubDummy> SIMPLE_SUB_ARRAY;
 
-        @Targets({SubDummy.class, SubDummy2.class})
         public static final GlobUnionField SIMPLE_SUB_UNION;
 
         static {
@@ -52,10 +42,8 @@ public class DummyObjects {
 
         public static LongField longValue;
 
-        @XmlNode_
         public static StringField SUB_NAME;
 
-        @XmlNode_
         public static IntegerField COUNT;
 
         static {
